@@ -122,8 +122,8 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; }
-        #cart-modal, #review-modal { display: none; position: fixed; top: 0; left: 0; background: var(--bg-card); padding: 30px; width: 100%; max-width: 400px; height: 100%; z-index: 1001; overflow-y: auto; box-sizing: border-box; color: var(--text-main); }
-        #review-modal { height: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 20px; box-shadow: var(--shadow-md); padding: 25px; }
+        #cart-modal, #review-modal, #admin-modal { display: none; position: fixed; top: 0; left: 0; background: var(--bg-card); padding: 30px; width: 100%; max-width: 400px; height: 100%; z-index: 1001; overflow-y: auto; box-sizing: border-box; color: var(--text-main); }
+        #review-modal, #admin-modal { height: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 20px; box-shadow: var(--shadow-md); padding: 25px; }
 
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-light); padding-bottom: 20px; margin-bottom: 20px; }
         
@@ -204,6 +204,7 @@
             <button class="action-icon-btn" onclick="toggleDataSaver()" title="توفير الإنترنت">⚡</button>
             <button class="action-icon-btn" onclick="toggleSepia()" title="حماية البصر">👁️</button>
             <button class="action-icon-btn" onclick="toggleTheme()" id="themeBtn" title="الوضع الليلي">🌙</button>
+            <button class="action-icon-btn" onclick="openAdminModal()" title="لوحة التحكم">⚙️</button>
             <div class="cart-trigger" onclick="toggleCart()">
                 <span class="cart-icon">🛒</span>
                 <div class="cart-count" id="cart-count">0</div>
@@ -286,6 +287,16 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة تحكم المدير المصغرة -->
+    <div id="admin-modal">
+        <h3 style="margin: 0 0 15px; color: var(--brand); font-weight: 900;">⚙️ لوحة تحكم المدير</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">رصيد نقاط الولاء الحالي للعملاء، وتعديل حالة المتاجر السريعة.</p>
+        <div style="background:var(--bg-body); padding:12px; border-radius:10px; margin-bottom:15px; font-size:13px; font-weight:800;">
+            ⭐ رصيد نقاطك الحالي: <span id="admin-user-points" style="color:var(--brand-secondary)">0</span> نقطة
+        </div>
+        <button class="whatsapp-btn" onclick="closeModals()" style="margin-top:0; padding:10px; font-size:15px;">إغلاق لوحة التحكم</button>
+    </div>
+
     <div id="backToTop" onclick="scrollToTop()">⬆</div>
     <div id="toast"></div>
 
@@ -308,6 +319,12 @@
             </div>
         </div>
         <div class="min-order-container"><div id="min-order-text">اطلب بـ 200 ج.م لتوصيل مجاني 🛵</div><div class="progress-bg"><div class="progress-bar" id="min-order-progress"></div></div></div>
+        
+        <!-- نظام ولاء العملاء (نقاط) -->
+        <div id="loyalty-banner" style="background:#fffbeb; border:1px solid #fde68a; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:800; color:#b45309; display:none;">
+            🎁 مبروك! لديك نقاط ولاء كافية لخصم إضافي على هذا الطلب.
+        </div>
+
         <div id="cart-items"></div>
         <div class="cross-sell-section" id="cross-sell-box"><div style="font-weight:900; margin-bottom:10px;">💡 نقترح لك أيضاً:</div><div id="cross-sell-items"></div></div>
         
@@ -318,8 +335,21 @@
             <option value="المنزل الرئيسي">المنزل الرئيسي</option>
             <option value="مكان العمل / المحل">مكان العمل / المحل</option>
         </select>
-        <textarea id="order-address" class="custom-input" rows="2" placeholder="عنوان التوصيل بالتفصيل..." oninput="saveCurrentAddress()"></textarea>
         
+        <!-- خانة العنوان مع زر GPS السحري -->
+        <div style="position:relative;">
+            <textarea id="order-address" class="custom-input" rows="2" placeholder="عنوان التوصيل بالتفصيل..." oninput="saveCurrentAddress()"></textarea>
+            <button onclick="getLiveLocation()" style="position:absolute; bottom:8px; left:8px; background:var(--brand); color:white; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" title="تحديد موقعي الحالي GPS">📍 موقعي</button>
+        </div>
+
+        <!-- خيار الدفع الإلكتروني (إنستا باي وفودافون كاش) -->
+        <select id="payment-method" class="custom-input">
+            <option value="الدفع عند الاستلام (كاش)">الدفع عند الاستلام (كاش)</option>
+            <option value="تحويل إنستا باي (InstaPay)">تحويل إنستا باي (InstaPay)</option>
+            <option value="فودافون كاش (Vodafone Cash)">فودافون كاش (Vodafone Cash)</option>
+        </select>
+        <input type="text" id="payment-ref" class="custom-input" placeholder="رقم التحويل أو مرجع الدفع (إن وجد)..." style="display:none;">
+
         <textarea id="order-notes" class="custom-input" rows="2" placeholder="ملاحظات الطلب..."></textarea>
         <div class="promo-container"><input type="text" id="promo-code" class="custom-input" placeholder="كود خصم؟" style="margin-top:0"><button class="apply-btn" onclick="applyPromo()">تفعيل</button></div>
         
@@ -341,6 +371,7 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let ordersHistory = JSON.parse(localStorage.getItem('ordersHistory')) || [];
+        let userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
         let allProductsData = []; 
         let currentDiscountPercent = 0; 
         const phoneNumber = "201019267002";
@@ -349,9 +380,45 @@
         function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
         function saveWishlist() { localStorage.setItem('wishlist', JSON.stringify(wishlist)); }
 
+        // إظهار خانة مرجع الدفع لو اختار إنستا باي أو فودافون كاش
+        document.getElementById('payment-method').addEventListener('change', function() {
+            let refInput = document.getElementById('payment-ref');
+            if(this.value.includes('كاش') || this.value.includes('إنستا')) {
+                refInput.style.display = 'block';
+            } else {
+                refInput.style.display = 'none';
+            }
+        });
+
+        // زر GPS لتحديد الموقع الحالي
+        function getLiveLocation() {
+            if (navigator.geolocation) {
+                showToast("📍 جاري تحديد موقعك الحالي...");
+                navigator.geolocation.getCurrentPosition((position) => {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    let mapsLink = `https://maps.google.com/?q=${lat},${lon}`;
+                    let addressField = document.getElementById('order-address');
+                    addressField.value = `موقعي GPS: ${mapsLink}`;
+                    saveCurrentAddress();
+                    showToast("✅ تم تحديد الموقع بنجاح!");
+                }, () => {
+                    showToast("❌ تعذر تحديد الموقع، برجاء كتابته يدوياً");
+                });
+            } else {
+                showToast("متصفحك لا يدعم تحديد الموقع");
+            }
+        }
+
         function toggleAIChat() {
             let box = document.getElementById('ai-chat-box');
             box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function openAdminModal() {
+            document.getElementById('admin-user-points').innerText = userPoints;
+            document.getElementById('admin-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
         }
 
         function sendAIChatMessage() {
@@ -364,9 +431,9 @@
             input.value = '';
 
             setTimeout(() => {
-                let reply = "أهلاً بك! يمكنك تصفح الأقسام وإضافة المنتجات للسلة وإرسال طلبك بكل سهولة.";
-                if(text.includes('مواعيد') || text.includes('فتح')) reply = "المحل يفتح يومياً من الساعة 8 صباحاً حتى 11 مساءً.";
-                else if(text.includes('توصيل') || text.includes('دليفري')) reply = "التوصيل متاح لقرية ليكو وأبو كبير، وتوصيل مجاني للطلبات فوق 200 جنيه!";
+                let reply = "أهلاً بك! يمكنك تصفح المنتجات وإضافتها للسلة بكل سهولة.";
+                if(text.includes('مواعيد') || text.includes('فتح')) reply = "المحل يفتح يومياً من 8 صباحاً حتى 11 مساءً.";
+                else if(text.includes('توصيل') || text.includes('دليفري')) reply = "التوصيل متاح لقرية ليكو وأبو كبير والقرى المجاورة!";
                 msgContainer.innerHTML += `<div class="ai-msg">${reply}</div>`;
                 msgContainer.scrollTop = msgContainer.scrollHeight;
             }, 600);
@@ -411,7 +478,7 @@
         function toggleDataSaver() {
             document.body.classList.toggle('data-saver');
             localStorage.setItem('dataSaver', document.body.classList.contains('data-saver') ? 'on' : 'off');
-            showToast(document.body.classList.contains('data-saver') ? "⚡ تم تفعيل توفير الإنترنت" : "🖼️ تم إيقاف توفير الإنترنت");
+            showToast(document.body.classList.contains('data-saver') ? "⚡ تم توفير الإنترنت" : "🖼️ تم إيقاف توفير الإنترنت");
         }
 
         function toggleSepia() {
@@ -705,6 +772,14 @@
             document.getElementById('cart-count').innerText = totalCount;
             document.getElementById('summary-weight').innerText = totalWeight.toFixed(1) + ' كجم';
             
+            // تفعيل رسالة الولاء لو العميل عنده نقاط
+            let loyaltyBanner = document.getElementById('loyalty-banner');
+            if (userPoints >= 50) {
+                loyaltyBanner.style.display = 'block';
+            } else {
+                loyaltyBanner.style.display = 'none';
+            }
+
             const summaryBox = document.getElementById('cart-summary-box');
             const progressText = document.getElementById('min-order-text');
             const progressBar = document.getElementById('min-order-progress');
@@ -761,6 +836,7 @@
         function closeModals() {
             document.getElementById('cart-modal').style.display = 'none';
             document.getElementById('review-modal').style.display = 'none';
+            document.getElementById('admin-modal').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
 
@@ -785,11 +861,18 @@
 
             const orderId = Math.floor(1000 + Math.random() * 9000);
             let itemsTotal = 0; cart.forEach(item => { itemsTotal += item.price * item.qty; });
+            
+            // تحديث نقاط الولاء (10 نقاط لكل عملية شراء)
+            userPoints += 15;
+            localStorage.setItem('userPoints', userPoints);
+
             let discountAmount = itemsTotal * currentDiscountPercent; let priceAfter = itemsTotal - discountAmount;
             let deliveryFee = (priceAfter < 200) ? 15 : 0; let finalTotal = priceAfter + deliveryFee;
             let notes = document.getElementById('order-notes').value.trim();
             let address = document.getElementById('order-address').value.trim();
             let deliveryTime = document.getElementById('delivery-time').value;
+            let payMethod = document.getElementById('payment-method').value;
+            let payRef = document.getElementById('payment-ref').value.trim();
 
             ordersHistory.push({
                 id: orderId, date: new Date().toLocaleDateString('ar-EG'),
@@ -802,6 +885,8 @@
             message += `======================\n📦 المنتجات = ${itemsTotal} ج\n`;
             if(currentDiscountPercent > 0) message += `🎉 خصم = -${discountAmount.toFixed(2)} ج\n`;
             message += `🛵 التوصيل = ${(deliveryFee > 0) ? deliveryFee + ' ج' : 'مجاناً'}\n💰 النهائي = ${finalTotal.toFixed(2)} ج.م\n\n`;
+            message += `💳 طريقة الدفع: ${payMethod}\n`;
+            if(payRef !== '') message += `📌 رقم المرجع/التحويل: ${payRef}\n`;
             message += `⏱️ موعد الاستلام: ${deliveryTime}\n`;
             if(address !== '') message += `📍 العنوان: ${address}\n`;
             if(notes !== '') message += `📝 ملاحظات: ${notes}\n`;
