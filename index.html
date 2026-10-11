@@ -227,11 +227,14 @@
         </div>
     </div>
 
+    <!-- شريط الأقسام المحدث (شامل المشروبات والمنظفات) -->
     <div class="tabs-nav">
         <button class="tab-btn active" onclick="openCategory(event, 'all')">كل المنتجات</button>
         <button class="tab-btn" onclick="openCategory(event, 'dairy')">ألبان وأجبان</button>
         <button class="tab-btn" onclick="openCategory(event, 'grocery')">زيت وبقالة</button>
         <button class="tab-btn" onclick="openCategory(event, 'basics')">مكرونة وأرز</button>
+        <button class="tab-btn" onclick="openCategory(event, 'drinks')">🥤 مشروبات</button>
+        <button class="tab-btn" onclick="openCategory(event, 'detergents')">🧼 منظفات</button>
         <button class="tab-btn" onclick="openCategory(event, 'library')">مكتبة</button>
         <button class="tab-btn" onclick="showWishlist(event)" style="color:#e11d48">❤️ المفضلة</button>
         <button class="tab-btn" onclick="showOrdersHistory(event)" style="color:var(--brand)">📦 طلباتي</button>
@@ -251,6 +254,8 @@
         <div id="dairy" class="section-wrapper"><h2 class="section-title">الألبان والأجبان</h2><div class="product-grid" id="grid-dairy"></div></div>
         <div id="grocery" class="section-wrapper"><h2 class="section-title">زيت ومعلبات</h2><div class="product-grid" id="grid-grocery"></div></div>
         <div id="basics" class="section-wrapper"><h2 class="section-title">مكرونة، أرز، وسكر</h2><div class="product-grid" id="grid-basics"></div></div>
+        <div id="drinks" class="section-wrapper"><h2 class="section-title">المشروبات والمياه</h2><div class="product-grid" id="grid-drinks"></div></div>
+        <div id="detergents" class="section-wrapper"><h2 class="section-title">المنظفات والعناية المنزلية</h2><div class="product-grid" id="grid-detergents"></div></div>
         <div id="library" class="section-wrapper"><h2 class="section-title">المكتبة والخدمات</h2><div class="product-grid" id="grid-library"></div></div>
         
         <div id="wishlist" class="section-wrapper"><h2 class="section-title">منتجاتي المفضلة ❤️</h2><div class="product-grid" id="grid-wishlist"></div><div id="empty-wishlist" style="display:none; text-align:center; padding: 30px; font-weight: bold;">لا توجد منتجات مفضلة.</div></div>
@@ -301,6 +306,7 @@
         </div>
     </div>
 
+    <!-- لوحة التحكم السرية المحدثة بالأقسام الجديدة -->
     <div id="admin-modal">
         <div id="admin-login-screen">
             <h3 style="margin: 0 0 15px; color: var(--brand); font-weight: 900;">🔐 تسجيل الدخول للوحة التحكم</h3>
@@ -321,6 +327,8 @@
                 <option value="dairy">ألبان وأجبان (dairy)</option>
                 <option value="grocery">زيت ومعلبات (grocery)</option>
                 <option value="basics">مكرونة وأرز (basics)</option>
+                <option value="drinks">مشروبات (drinks)</option>
+                <option value="detergents">منظفات (detergents)</option>
                 <option value="library">مكتبة (library)</option>
             </select>
             <input type="text" id="new-p-name" class="custom-input" placeholder="اسم المنتج...">
@@ -403,7 +411,6 @@
         </div>
     </div>
 
-    <!-- مؤثرات صوتية للإدارة (رقم 4) -->
     <audio id="orderAlertSound" src="https://actions.google.com/sounds/v1/ambiences/office_ambience.ogg" preload="auto"></audio>
 
     <script>
@@ -972,7 +979,6 @@
                 return; 
             }
 
-            // تنبيه صوتي واهتزاز إداري (رقم 4)
             document.getElementById('orderAlertSound').play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
@@ -996,7 +1002,6 @@
             });
             localStorage.setItem('ordersHistory', JSON.stringify(ordersHistory));
 
-            // تفعيل مؤشر حالة الطلب البصري (رقم 3)
             document.getElementById('live-tracker-box').style.display = 'block';
 
             let message = `أهلاً ماركت الشريف،\n\n🛒 طلب جديد رقم: #${orderId}\n📞 رقم تليفون العميل: ${phone}\n======================\n`;
