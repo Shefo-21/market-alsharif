@@ -93,6 +93,7 @@
         .badge.new { background: #10b981; }
         .badge.warning { background: #f59e0b; }
         .badge.gold { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .badge.bestseller { background: #8b5cf6; }
 
         .wishlist-btn { position: absolute; top: 12px; left: 12px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; color: var(--text-muted); transition: 0.3s; }
         .wishlist-btn.active { color: #e11d48; border-color: #e11d48; background: #fff1f2; }
@@ -256,6 +257,16 @@
         <div id="orders-history" class="section-wrapper"><h2 class="section-title">📦 طلباتي السابقة</h2><div id="orders-container"></div><div id="empty-orders" style="display:none; text-align:center; padding: 30px; font-weight: bold;">لم تقم بأي طلبات سابقة.</div></div>
     </div>
 
+    <!-- مؤشر حالة الطلب التفاعلي (رقم 3) -->
+    <div id="live-tracker-box" style="display:none; margin: 20px 5%; background: var(--bg-card); padding: 20px; border-radius: 15px; border: 1px solid var(--border-light); text-align: center;">
+        <h3 style="color: var(--brand); margin-top: 0; font-weight: 900;">🚚 حالة طلبك الأخير</h3>
+        <div style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 13px; font-weight: 800; color: var(--text-muted);">
+            <span id="step-1" style="color: var(--brand-secondary);">1. جاري تجهيز الطلب</span>
+            <span id="step-2">2. خرج للتوصيل</span>
+            <span id="step-3">3. تم التسليم بنجاح</span>
+        </div>
+    </div>
+
     <section style="background: var(--bg-card); padding: 50px 5%; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); text-align: center; margin-top: 20px;">
         <h2 style="color: var(--text-main); font-weight: 900; margin-bottom: 30px; font-size: 24px;">آراء عملائنا في الشريف</h2>
         <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
@@ -355,7 +366,6 @@
         
         <select id="delivery-time" class="custom-input"><option value="أسرع وقت">التوصيل: أسرع وقت</option><option value="مسائي">مسائي</option></select>
         
-        <!-- خانة رقم التليفون الإجبارية -->
         <input type="tel" id="customer-phone" class="custom-input" placeholder="رقم تليفونك الشخصي (إجباري)..." oninput="saveCustomerPhone()" required>
 
         <select id="saved-addresses" class="custom-input" onchange="useSelectedAddress()" style="margin-bottom:0">
@@ -392,6 +402,9 @@
             <button onclick="copyInvoiceText()" style="background:#475569; color:white; border:none; border-radius:15px; font-family:'Cairo'; font-weight:800; cursor:pointer; flex:1; font-size:13px;" title="نسخ نص الفاتورة">📋 نسخ</button>
         </div>
     </div>
+
+    <!-- مؤثرات صوتية للإدارة (رقم 4) -->
+    <audio id="orderAlertSound" src="https://actions.google.com/sounds/v1/ambiences/office_ambience.ogg" preload="auto"></audio>
 
     <script>
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -768,7 +781,7 @@
             
             let badgeHtml = '';
             if(badge) {
-                let badgeClass = badge.includes('مميز') ? 'badge gold' : (badge.includes('جديد') ? 'badge new' : (badge.includes('قريب') ? 'badge warning' : 'badge'));
+                let badgeClass = badge.includes('مميز') ? 'badge gold' : (badge.includes('جديد') ? 'badge new' : (badge.includes('قريب') ? 'badge warning' : (badge.includes('الأكثر') ? 'badge bestseller' : 'badge')));
                 badgeHtml = `<div class="${badgeClass}">${badge}</div>`;
             }
             
@@ -954,10 +967,14 @@
             
             let phone = document.getElementById('customer-phone').value.trim();
             if(!phone || phone.length < 10) { 
-                showToast("⚠️ برجاء كتابة رقم تليفون صحيح (11 رقماً) لنتواصل معك!"); 
+                showToast("⚠️ برجاء كتابة رقم تليفون صحيح لنتواصل معك!"); 
                 document.getElementById('customer-phone').focus();
                 return; 
             }
+
+            // تنبيه صوتي واهتزاز إداري (رقم 4)
+            document.getElementById('orderAlertSound').play().catch(() => {});
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
             const orderId = Math.floor(1000 + Math.random() * 9000);
             let itemsTotal = 0; cart.forEach(item => { itemsTotal += item.price * item.qty; });
@@ -978,6 +995,9 @@
                 items: cart.map(i => `${i.name} (x${i.qty})`), total: finalTotal.toFixed(2)
             });
             localStorage.setItem('ordersHistory', JSON.stringify(ordersHistory));
+
+            // تفعيل مؤشر حالة الطلب البصري (رقم 3)
+            document.getElementById('live-tracker-box').style.display = 'block';
 
             let message = `أهلاً ماركت الشريف،\n\n🛒 طلب جديد رقم: #${orderId}\n📞 رقم تليفون العميل: ${phone}\n======================\n`;
             cart.forEach(item => { message += `▪️ ${item.name} (x${item.qty}) = ${item.price * item.qty} ج\n`; });
