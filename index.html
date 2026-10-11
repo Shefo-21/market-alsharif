@@ -86,7 +86,6 @@
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
         
-        /* الفريم المميز والظاهر لكل منتج على حدة */
         .product-card { background: var(--bg-card); border-radius: 22px; padding: 15px; box-shadow: var(--shadow-sm); border: 2px solid var(--border-light); display: flex; flex-direction: column; position: relative; transition: 0.3s; }
         .product-card:hover { transform: translateY(-5px); border-color: var(--brand); box-shadow: var(--shadow-md); z-index: 2; }
 
@@ -195,7 +194,6 @@
     <header>
         <div class="logo-wrapper">
             <a href="#" class="logo" id="site-logo">مكتبة الشريف<span>.</span></a>
-            <!-- الضغط 3 مرات هنا يفتح اللوحة السرية بدون أي تلميح بكلمة المرور -->
             <div class="admin-name" id="admin-trigger" title="إدارة الماركت">إدارة المهندس شريف محمود</div>
         </div>
         
@@ -292,7 +290,6 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة التحكم السرية (بدون أي إظهار لـ 5678 علناً) -->
     <div id="admin-modal">
         <div id="admin-login-screen">
             <h3 style="margin: 0 0 15px; color: var(--brand); font-weight: 900;">🔐 تسجيل الدخول للوحة التحكم</h3>
@@ -358,8 +355,8 @@
         
         <select id="delivery-time" class="custom-input"><option value="أسرع وقت">التوصيل: أسرع وقت</option><option value="مسائي">مسائي</option></select>
         
-        <!-- خانة رقم تليفون العميل الإجبارية -->
-        <input type="tel" id="customer-phone" class="custom-input" placeholder="رقم تليفونك (للتواصل معك)..." oninput="saveCustomerPhone()" required>
+        <!-- خانة رقم التليفون الإجبارية -->
+        <input type="tel" id="customer-phone" class="custom-input" placeholder="رقم تليفونك الشخصي (إجباري)..." oninput="saveCustomerPhone()" required>
 
         <select id="saved-addresses" class="custom-input" onchange="useSelectedAddress()" style="margin-bottom:0">
             <option value="">اختر عنواناً محفوظاً أو اكتب جديداً...</option>
@@ -942,7 +939,11 @@
         function copyInvoiceText() {
             if (cart.length === 0) { showToast("السلة فارغة!"); return; }
             let phone = document.getElementById('customer-phone').value.trim();
-            if(!phone) { showToast("برجاء كتابة رقم التليفون أولاً!"); return; }
+            if(!phone) { 
+                showToast("⚠️ برجاء كتابة رقم تليفونك أولاً!"); 
+                document.getElementById('customer-phone').focus();
+                return; 
+            }
             let text = `طلب من ماركت الشريف (رقم التليفون: ${phone}):\n`;
             cart.forEach(i => { text += `- ${i.name} (x${i.qty}) = ${i.price * i.qty} ج\n`; });
             navigator.clipboard.writeText(text).then(() => { showToast("📋 تم نسخ الفاتورة"); });
@@ -950,8 +951,13 @@
 
         function sendToWhatsApp() {
             if (cart.length === 0) { showToast("السلة فارغة!"); return; }
+            
             let phone = document.getElementById('customer-phone').value.trim();
-            if(!phone) { showToast("⚠️ برجاء كتابة رقم تليفونك لنتواصل معك!"); document.getElementById('customer-phone').focus(); return; }
+            if(!phone || phone.length < 10) { 
+                showToast("⚠️ برجاء كتابة رقم تليفون صحيح (11 رقماً) لنتواصل معك!"); 
+                document.getElementById('customer-phone').focus();
+                return; 
+            }
 
             const orderId = Math.floor(1000 + Math.random() * 9000);
             let itemsTotal = 0; cart.forEach(item => { itemsTotal += item.price * item.qty; });
