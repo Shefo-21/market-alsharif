@@ -5,12 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title id="site-title">مكتبة الشريف | تسوق بذكاء</title>
-    <meta name="description" content="أسرع دليفري لطلبات البقالة والمستلزمات المكتبية في أبو كبير، الشرقية.">
+    <meta name="description" content="أسرع دليفري لطلبات البقالة والمستلزمات المكتبية في أبو كبير وقرية ليكو، الشرقية.">
+    
+    <!-- كلمات مفتاحية لمحركات البحث (SEO) -->
+    <meta name="keywords" content="مكتبة الشريف, طلبات أبو كبير, توصيل أبو كبير, سوبر ماركت مكتبة الشريف, مكتبة أبو كبير, دليفري أبو كبير, قرية ليكو, ماركت الشريف, بقالة أبو كبير">
+    <meta name="author" content="المهندس شريف محمود">
     
     <meta name="theme-color" content="#1e40af">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="مكتبة الشريف">
+    
+    <!-- كود تعريف النشاط التجاري لجوجل (Schema Markup) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "مكتبة الشريف",
+      "image": "https://via.placeholder.com/500",
+      "description": "أسرع دليفري لطلبات البقالة والمستلزمات المكتبية في أبو كبير وقرية ليكو.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "أبو كبير",
+        "addressRegion": "الشرقية",
+        "addressCountry": "EG"
+      },
+      "telephone": "+201019267002",
+      "openingHours": "Mo-Su 08:00-23:00",
+      "priceRange": "$$"
+    }
+    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -32,12 +56,12 @@
             --text-muted: #7f5539; --border-light: #d6ccc2; --brand: #bc6c25; --brand-secondary: #dda15e;
         }
 
-        /* Idea 5: Custom Scrollbar */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 4px; }
         ::-webkit-scrollbar-track { background: var(--bg-body); }
         ::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 10px; }
 
-        /* Idea 1: Scroll Progress Bar */
+        /* Scroll Progress Bar */
         #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--brand-secondary), #f59e0b); z-index: 10001; width: 0%; transition: width 0.1s; border-top-right-radius: 4px; border-bottom-right-radius: 4px;}
 
         @keyframes fadeInElegant { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -59,11 +83,11 @@
 
         .fly-item { position: fixed; z-index: 10000; width: 60px; height: 60px; object-fit: cover; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; }
         
-        /* Idea 9: Enhanced Bounce */
+        /* Enhanced Bounce */
         @keyframes cartPop { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 60% { transform: scale(0.9); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
         .pop-anim { animation: cartPop 0.5s ease; }
 
-        /* Idea 10: Glassmorphism */
+        /* Glassmorphism */
         header { background-color: rgba(255, 255, 255, 0.85) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border-light); transition: 0.4s; }
         body.dark-mode header, body.dark-mode .sticky-bottom-bar, body.dark-mode .tabs-nav { background-color: rgba(30, 41, 59, 0.85) !important; }
 
@@ -127,13 +151,13 @@
         .filter-section input[type="range"] { flex: 1; max-width: 200px; accent-color: var(--brand-secondary); }
 
         .container { max-width: 1400px; margin: auto; padding: 10px 5% 80px; min-height: 50vh; display: flex; flex-direction: column; gap: 30px; }
-        .section-wrapper { display: none; scroll-margin-top: 140px; } /* Support smooth scroll to section */
+        .section-wrapper { display: none; scroll-margin-top: 140px; } 
         .section-title { font-size: 22px; font-weight: 900; color: var(--text-main); margin: 20px 0; display: flex; align-items: center; gap: 10px; }
         .section-title::before { content: ""; display: block; width: 6px; height: 25px; background: var(--brand-secondary); border-radius: 5px; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
         
-        /* Idea 6: Scroll Reveal */
+        /* Scroll Reveal */
         .product-card { background: var(--bg-card); border-radius: 22px; padding: 15px; box-shadow: var(--shadow-sm); border: 2px solid var(--border-light); display: flex; flex-direction: column; position: relative; transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s, box-shadow 0.3s; opacity: 0; transform: translateY(30px) scale(0.95); }
         .product-card.visible { opacity: 1; transform: translateY(0) scale(1); }
         .product-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--brand); box-shadow: var(--shadow-md); z-index: 2; }
@@ -159,6 +183,7 @@
         .price span { font-size: 12px; color: var(--text-muted); font-weight: 700; }
 
         .add-btn { background: var(--bg-body); color: var(--brand-secondary); border: 2px solid var(--border-light); padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 800; transition: 0.2s; position: relative; overflow: hidden; }
+        .add-btn:active { transform: scale(0.9); }
         .qty-controller { display: flex; align-items: center; background: var(--brand-secondary); border-radius: 20px; color: white; height: 34px; position: relative; overflow: hidden; }
         .qty-btn { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; width: 30px; cursor: pointer; position: relative; overflow: hidden;}
         .qty-num { font-size: 14px; font-weight: 800; min-width: 20px; text-align: center; }
@@ -187,18 +212,18 @@
         
         .whatsapp-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; width: 100%; padding: 15px; border-radius: 15px; font-size: 18px; font-weight: 800; margin-top: 20px; font-family: 'Cairo'; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); position: relative; overflow: hidden; }
         
-        /* Idea 3: Pulse Effect for WhatsApp */
+        /* Pulse Effect for WhatsApp */
         @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
         .floating-whatsapp { position: fixed; bottom: 30px; right: 30px; background: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); z-index: 999; text-decoration: none; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); animation: pulseGlow 2s infinite; position: relative; overflow: hidden; }
         .floating-whatsapp:hover { transform: scale(1.1); animation: none; }
         
         .ai-chat-btn { position: fixed; bottom: 100px; right: 30px; background: var(--brand); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: var(--shadow-md); z-index: 999; cursor: pointer; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
 
-        /* Idea 4: Ripple Effect Classes */
+        /* Ripple Effect Classes */
         .ripple-anim { position: absolute; border-radius: 50%; transform: scale(0); animation: rippleEffect 0.6s linear; background: rgba(255, 255, 255, 0.4); pointer-events: none; }
         @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
 
-        /* Idea 7: Success Confetti Overlay */
+        /* Success Confetti Overlay */
         #success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
         body.dark-mode #success-overlay { background: rgba(15,23,42,0.95); }
         #success-overlay.show { opacity: 1; visibility: visible; }
@@ -227,7 +252,6 @@
 
     <div id="elegant-welcome">🌸 مرحباً بكم في مكتبة الشريف 🌸</div>
 
-    <!-- Success Order Animation (UX Feature 7) -->
     <div id="success-overlay">
         <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
             <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
@@ -293,7 +317,6 @@
             <div class="skel-card skeleton"><div class="skel-img skeleton"></div><div class="skel-text skeleton"></div><div class="skel-text skeleton" style="width:50%"></div><div class="skel-price skeleton"></div><div class="skel-btn skeleton"></div></div>
         </div>
 
-        <!-- Scrollspy Sections -->
         <div id="dairy" class="section-wrapper scrollspy-sec"><h2 class="section-title">الألبان والأجبان</h2><div class="product-grid" id="grid-dairy"></div></div>
         <div id="grocery" class="section-wrapper scrollspy-sec"><h2 class="section-title">زيت ومعلبات</h2><div class="product-grid" id="grid-grocery"></div></div>
         <div id="basics" class="section-wrapper scrollspy-sec"><h2 class="section-title">مكرونة، أرز، وسكر</h2><div class="product-grid" id="grid-basics"></div></div>
@@ -340,7 +363,6 @@
     <a href="https://wa.me/201019267002" target="_blank" class="floating-whatsapp btn-ripple" title="تواصل عبر واتساب">💬</a>
     <div class="ai-chat-btn btn-ripple" onclick="toggleAIChat()" title="مساعد الذكاء الاصطناعي">🤖</div>
 
-    <!-- باقي الأكواد الثابتة للدردشة والإدارة -->
     <div id="ai-chat-box">
         <div class="ai-chat-header"><span>🤖 مساعدة الشريف الذكية</span><span style="cursor:pointer;" onclick="toggleAIChat()">✕</span></div>
         <div class="ai-chat-body" id="ai-chat-messages"><div class="ai-msg">أهلاً بك! أنا مساعدك الذكي، كيف يمكنني مساعدتك اليوم؟</div></div>
@@ -383,7 +405,6 @@
     <div id="toast"></div>
     <div class="overlay" id="overlay" onclick="closeModals()"></div>
 
-    <!-- السلة الثابتة والمؤمنة -->
     <div id="cart-modal">
         <div class="cart-header">
             <h2 style="margin:0; font-size:22px; color:var(--brand); font-weight:900;">سلة المشتريات</h2>
@@ -423,10 +444,8 @@
     <audio id="orderAlertSound" src="https://actions.google.com/sounds/v1/ambiences/office_ambience.ogg" preload="auto"></audio>
 
     <script>
-        // رسالة الترحيب
         setTimeout(() => { let ew = document.getElementById('elegant-welcome'); if(ew) { ew.style.top = '25px'; setTimeout(() => { ew.style.top = '-100px'; }, 4000); } }, 1200);
 
-        // Idea 4: Ripple Effect (تفاعل الزرار زي الماية)
         document.addEventListener('click', function(e) {
             let target = e.target.closest('.btn-ripple');
             if (!target) return;
@@ -442,7 +461,6 @@
             target.appendChild(circle);
         });
 
-        // Idea 1: Progress Scroll Bar (شريط التمرير)
         window.addEventListener('scroll', () => {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -450,12 +468,10 @@
             document.getElementById("scroll-progress").style.width = scrolled + "%";
         });
 
-        // Idea 6: Scroll Reveal Observer (ظهور المنتجات بسلاسة)
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
         }, { threshold: 0.1 });
 
-        // Idea 8: Scrollspy Highlighting (تظليل القسم النشط)
         const sections = document.querySelectorAll('.scrollspy-sec');
         const tabLinks = document.querySelectorAll('.tab-btn');
         const tabsNav = document.getElementById('main-tabs');
@@ -470,7 +486,6 @@
                     link.classList.remove('active');
                     if (link.getAttribute('data-target') === current) {
                         link.classList.add('active');
-                        // Center active tab
                         let linkLeft = link.offsetLeft;
                         let linkWidth = link.offsetWidth;
                         let navWidth = tabsNav.offsetWidth;
@@ -541,7 +556,7 @@
             if(searchEl) searchEl.value = name;
             let dd = document.getElementById('search-dropdown');
             if(dd) dd.style.display = 'none';
-            openCategory(null, 'all'); // أرجع للرئيسية لو كان في قائمة طلباتي
+            openCategory(null, 'all'); 
             setTimeout(() => { filterProductsGrid(); }, 100);
         }
 
@@ -605,7 +620,6 @@
 
                 if(allProductsData.length > 0) {
                     allProductsData.forEach(p => renderProduct(p.category, p.name, p.price, p.img, p.oldPrice, p.badge, p.stock, `grid-${p.category}`));
-                    // تشغيل المراقبة للكروت الجديدة عشان الأنيميشن
                     document.querySelectorAll('.product-card').forEach(card => revealObserver.observe(card));
                     
                     let wrappers = document.getElementsByClassName("scrollspy-sec");
@@ -618,7 +632,6 @@
             }
         }
 
-        // UX Idea 2: Fly to Cart
         function flyToCartAnim(event, imgSrc) {
             if(!event || !imgSrc) return;
             const btn = event.currentTarget || event.target;
@@ -806,10 +819,9 @@
             setTimeout(() => { t.className = t.className.replace("show", ""); }, 1500);
         }
 
-        // Logic adjusted for proper scrolling (UX Feature 8)
         function openCategory(evt, categoryName) {
             let vo = document.querySelectorAll(".view-only");
-            vo.forEach(el => el.style.display = 'none'); // إخفاء المفضلة والطلبات
+            vo.forEach(el => el.style.display = 'none'); 
 
             if (categoryName === 'wishlist' || categoryName === 'orders-history') {
                 isMainViewActive = false;
@@ -821,7 +833,6 @@
                 }
             } else {
                 if(!isMainViewActive) {
-                    // رجوع للشكل الطبيعي
                     document.querySelectorAll(".scrollspy-sec").forEach(el => el.style.display = 'block');
                     isMainViewActive = true;
                 }
@@ -837,7 +848,6 @@
             for (let i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
             if(evt && evt.currentTarget) {
                 evt.currentTarget.classList.add("active");
-                // Center tab
                 let tabsNav = document.getElementById('main-tabs');
                 let linkLeft = evt.currentTarget.offsetLeft;
                 let linkWidth = evt.currentTarget.offsetWidth;
@@ -896,13 +906,11 @@
             message += `================\n📦 المنتجات = ${itemsTotal} ج\n🛵 التوصيل = ${(deliveryFee > 0) ? deliveryFee + ' ج' : 'مجاناً'}\n💰 النهائي = ${finalTotal.toFixed(2)} ج.م\n`;
             if(address !== '') message += `📍 العنوان: ${address}\n`;
 
-            closeModals(); // قفل السلة الأول
+            closeModals(); 
 
-            // UX Idea 7: Success Confetti Overlay
             let succOverlay = document.getElementById('success-overlay');
             if(succOverlay) {
                 succOverlay.classList.add('show');
-                // انتظار ثانية ونص حتى يستمتع الزبون بحركة التأكيد
                 setTimeout(() => {
                     succOverlay.classList.remove('show');
                     cart = []; saveCart(); updateCartUI();
