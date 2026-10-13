@@ -126,8 +126,8 @@
     </footer>
 
     <script>
-        // رابط السيرفر (مؤقتاً شغال على جهازك لحد ما نرفعه)
-        const apiUrl = 'http://localhost:5005/api/Products';
+        // الرابط الجديد بعد رفع السيرفر على الإنترنت بنجاح
+        const apiUrl = 'http://maktabatelsharif-api.somee.com/api/Products';
 
         async function fetchAndDisplayProducts() {
             const productsContainer = document.getElementById('products-container');
@@ -168,8 +168,7 @@
                 });
             } catch (error) {
                 console.error('الربط فشل:', error);
-                // الرسالة دي اللي هتظهر للناس على النت لحد ما نرفع السيرفر بتاعك
-                productsContainer.innerHTML = '<h3 class="loading-msg" style="color: #e74c3c;">عذراً، جاري تحديث خوادم مكتبة الشريف. يرجى العودة لاحقاً.</h3>';
+                productsContainer.innerHTML = '<h3 class="loading-msg" style="color: #e74c3c;">عذراً، حدث خطأ أثناء تحميل المنتجات. يرجى المحاولة لاحقاً.</h3>';
             }
         }
 
