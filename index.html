@@ -581,46 +581,43 @@
         }
 
         // ==========================================
-        //  الكود الجديد للربط بـ Google Sheets مباشر
+        //  الكود الخاص بيك إنت اللي بيقرأ من الشيت بتاعك مباشر
         // ==========================================
-        const sheetId = '1qOJJ_FuQuoz06Qfi5rPeFCCkx70hz957RaPYq-wLL60';
-        const apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTx5Eb8TrIetChYvqRo4DGD25jP0y8JV-nDRGnVHRPqI-yLwcOMni1OYY9Grej9fefdROet_5I4Luj_/pub?output=csv";
+
+        function parseCSVLine(text) {
+            let ret = []; let insideQuote = false; let value = '';
+            for (let i = 0; i < text.length; i++) {
+                if (text[i] === '"') { insideQuote = !insideQuote; }
+                else if (text[i] === ',' && !insideQuote) { ret.push(value); value = ''; }
+                else { value += text[i]; }
+            }
+            ret.push(value); return ret;
+        }
 
         async function loadProducts() {
             try {
-                const response = await fetch(apiUrl);
-                const text = await response.text();
+                const response = await fetch(sheetURL + "&t=" + new Date().getTime()); 
+                const data = await response.text();
                 
                 let loader = document.getElementById('skeleton-loader');
                 if(loader) loader.style.display = 'none'; 
                 
-                // استخراج الداتا الصافية من رد جوجل
-                const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                const data = JSON.parse(jsonString);
-                const rows = data.table.rows;
-
-                if (!rows || rows.length === 0) return;
-
-                rows.forEach(row => {
-                    const c = row.c;
-                    if (!c) return;
+                let lines = data.split('\n');
+                for(let i = 1; i < lines.length; i++) {
+                    if(lines[i].trim() === '') continue;
+                    const cols = parseCSVLine(lines[i].trim()); if(cols.length < 3) continue;
                     
-                    // أعمدة الشيت: 0:id, 1:name, 2:category, 3:price, 4:oldPrice, 5:stock, 6:imageUrl, 7:badge, 8:isActive
-                    const isActive = c[8] && c[8].v ? c[8].v.toString().toLowerCase() === 'true' : false;
-                    if (!isActive) return;
-
-                    const name = c[1] && c[1].v ? c[1].v : '';
-                    const category = c[2] && c[2].v ? c[2].v : '';
-                    const price = c[3] && c[3].v ? parseFloat(c[3].v) : 0;
-                    const oldPrice = c[4] && c[4].v ? c[4].v : null;
-                    const stock = c[5] && c[5].v ? parseInt(c[5].v) : 999;
-                    const img = c[6] && c[6].v ? c[6].v : 'https://images.unsplash.com/photo-1605371924599-2d0365da1ae0?auto=format&fit=crop&w=300&q=80';
-                    const badge = c[7] && c[7].v ? c[7].v : null;
-
-                    if(name) {
-                        allProductsData.push({category, name, price, img, oldPrice, badge, stock});
-                    }
-                });
+                    const category = cols[0] ? cols[0].trim() : ''; 
+                    const name = cols[1] ? cols[1].trim() : ''; 
+                    const price = cols[2] ? parseFloat(cols[2].trim()) : 0;
+                    let img = (cols[3] && cols[3].trim() !== '') ? cols[3].trim() : "https://images.unsplash.com/photo-1605371924599-2d0365da1ae0?auto=format&fit=crop&w=300&q=80"; 
+                    let oldPrice = (cols.length > 4 && cols[4] !== undefined && cols[4].trim() !== '') ? cols[4].trim() : null; 
+                    let badge = (cols.length > 5 && cols[5] !== undefined && cols[5].trim() !== '') ? cols[5].trim() : null;
+                    let stock = (cols.length > 6 && cols[6] !== undefined && cols[6].trim() !== '') ? parseInt(cols[6].trim()) : 999;
+                    
+                    allProductsData.push({category, name, price, img, oldPrice, badge, stock});
+                }
 
                 if(customAdminProducts.length > 0) { customAdminProducts.forEach(p => allProductsData.push(p)); }
 
@@ -635,7 +632,6 @@
             } catch (error) { 
                 let loader = document.getElementById('skeleton-loader');
                 if(loader) { loader.style.display = 'block'; loader.innerHTML = "<h3 style='color:red; text-align:center; padding:30px;'>عذراً، حدث خطأ في تحميل المنتجات.</h3>"; }
-                console.error(error);
             }
         }
         // ==========================================
@@ -969,8 +965,7 @@
             } else { showToast("❌ كلمة المرور غير صحيحة"); }
         }
         function addNewProductFromAdmin() { 
-            showToast("⚠️ سيتم إضافة المنتجات مباشرة من شيت جوجل");
-            setTimeout(()=> { window.open(`https://docs.google.com/spreadsheets/d/${sheetId}/edit`, '_blank'); }, 1000); 
+            showToast("⚠️ لتعديل المنتجات افتح ملف الإكسيل اللي إنت عملته");
         }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
         function toggleDataSaver() { document.body.classList.toggle('data-saver'); showToast("⚡ تم تبديل وضع توفير البيانات"); }
