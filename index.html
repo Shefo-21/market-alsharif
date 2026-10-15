@@ -148,15 +148,25 @@
         }
     </style>
 </head>
+<!-- تم إغلاق كليك يمين لضمان الحماية -->
 <body oncontextmenu="return false;">
 
     <div id="scroll-progress"></div>
     <div id="elegant-welcome">🌸 مرحباً بكم في مكتبة الشريف 🌸</div>
 
+    <div id="success-overlay">
+        <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="25" fill="none" stroke="#10b981" stroke-width="3"/>
+            <path fill="none" stroke="#10b981" stroke-width="3" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+        <h2 style="color:var(--text-main); font-weight:900;">تم تجهيز طلبك بنجاح!</h2>
+        <p style="color:var(--text-muted); font-weight:700;">جاري التحويل للواتساب...</p>
+    </div>
+
     <header>
         <div class="logo-wrapper">
             <a href="#" class="logo" id="site-logo">مكتبة الشريف<span>.</span></a>
-            <div class="admin-name">إدارة مهندس شريف محمود</div>
+            <div class="admin-name" title="إدارة الماركت">إدارة مهندس شريف محمود</div>
         </div>
         
         <div class="search-container">
@@ -178,14 +188,15 @@
     </header>
 
     <div class="tabs-nav" id="main-tabs">
-        <button class="tab-btn active" data-target="all" onclick="openCategory(event, 'all')">كل المنتجات</button>
-        <button class="tab-btn" data-target="dairy" onclick="openCategory(event, 'dairy')">ألبان وأجبان</button>
-        <button class="tab-btn" data-target="grocery" onclick="openCategory(event, 'grocery')">زيت وبقالة</button>
-        <button class="tab-btn" data-target="basics" onclick="openCategory(event, 'basics')">مكرونة وأرز</button>
-        <button class="tab-btn" data-target="drinks" onclick="openCategory(event, 'drinks')">🥤 مشروبات</button>
-        <button class="tab-btn" data-target="detergents" onclick="openCategory(event, 'detergents')">🧼 منظفات</button>
-        <button class="tab-btn" data-target="library" onclick="openCategory(event, 'library')">مكتبة</button>
-        <button class="tab-btn" onclick="showWishlist(event)" style="color:#e11d48">❤️ المفضلة</button>
+        <button class="tab-btn active" data-target="all" onclick="openCategory('all')">كل المنتجات</button>
+        <button class="tab-btn" data-target="dairy" onclick="openCategory('dairy')">ألبان وأجبان</button>
+        <button class="tab-btn" data-target="grocery" onclick="openCategory('grocery')">زيت وبقالة</button>
+        <button class="tab-btn" data-target="basics" onclick="openCategory('basics')">مكرونة وأرز</button>
+        <!-- قسم المشروبات موجود -->
+        <button class="tab-btn" data-target="drinks" onclick="openCategory('drinks')">🥤 مشروبات</button>
+        <button class="tab-btn" data-target="detergents" onclick="openCategory('detergents')">🧼 منظفات</button>
+        <button class="tab-btn" data-target="library" onclick="openCategory('library')">مكتبة</button>
+        <button class="tab-btn" onclick="showWishlist()" style="color:#e11d48">❤️ المفضلة</button>
     </div>
 
     <div class="filter-section">
@@ -202,6 +213,7 @@
         <div id="dairy" class="section-wrapper scrollspy-sec"><h2 class="section-title">الألبان والأجبان</h2><div class="product-grid" id="grid-dairy"></div></div>
         <div id="grocery" class="section-wrapper scrollspy-sec"><h2 class="section-title">زيت ومعلبات</h2><div class="product-grid" id="grid-grocery"></div></div>
         <div id="basics" class="section-wrapper scrollspy-sec"><h2 class="section-title">مكرونة، أرز، وسكر</h2><div class="product-grid" id="grid-basics"></div></div>
+        <!-- قسم المشروبات في مكانه الأساسي -->
         <div id="drinks" class="section-wrapper scrollspy-sec"><h2 class="section-title">المشروبات والمياه</h2><div class="product-grid" id="grid-drinks"></div></div>
         <div id="detergents" class="section-wrapper scrollspy-sec"><h2 class="section-title">المنظفات والعناية المنزلية</h2><div class="product-grid" id="grid-detergents"></div></div>
         <div id="library" class="section-wrapper scrollspy-sec"><h2 class="section-title">المكتبة والخدمات</h2><div class="product-grid" id="grid-library"></div></div>
@@ -215,6 +227,7 @@
     <div id="sticky-bottom-bar" class="sticky-bottom-bar">
         <div class="sticky-details">
             <span class="sticky-count">لديك <span id="sticky-count-items">0</span> منتج بالسلة</span>
+            <!-- هنا السعر الصافي للمنتجات فقط (بدون مصاريف توصيل مزعجة) -->
             <span class="sticky-total" id="sticky-total-price">0 ج.م</span>
         </div>
         <button class="sticky-btn" onclick="processCheckoutClick()">إتمام الطلب ➔</button>
@@ -287,6 +300,7 @@
     <div id="toast"></div>
 
     <script>
+        // حماية الموقع
         document.onkeydown = function(e) {
             if(e.keyCode == 123) { return false; } 
             if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) { return false; }
@@ -393,7 +407,7 @@
 
         let isMainViewActive = true;
         
-        function openCategory(evt, categoryName) {
+        function openCategory(categoryName) {
             let vo = document.querySelectorAll(".view-only");
             vo.forEach(el => el.style.display = 'none'); 
 
@@ -423,14 +437,14 @@
             let tablinks = document.getElementsByClassName("tab-btn");
             for (let i = 0; i < tablinks.length; i++) { 
                 tablinks[i].classList.remove("active");
-            }
-            if(evt && evt.currentTarget) {
-                evt.currentTarget.classList.add("active");
-                let tabsNav = document.getElementById('main-tabs');
-                let linkLeft = evt.currentTarget.offsetLeft;
-                let linkWidth = evt.currentTarget.offsetWidth;
-                let navWidth = tabsNav.offsetWidth;
-                tabsNav.scrollTo({ left: linkLeft - (navWidth/2) + (linkWidth/2), behavior: 'smooth' });
+                if (tablinks[i].getAttribute('data-target') === categoryName) {
+                    tablinks[i].classList.add("active");
+                    let tabsNav = document.getElementById('main-tabs');
+                    let linkLeft = tablinks[i].offsetLeft;
+                    let linkWidth = tablinks[i].offsetWidth;
+                    let navWidth = tabsNav.offsetWidth;
+                    tabsNav.scrollTo({ left: linkLeft - (navWidth/2) + (linkWidth/2), behavior: 'smooth' });
+                }
             }
         }
 
@@ -578,7 +592,9 @@
                 document.getElementById('summary-items-total').innerText = itemsTotal + ' ج';
                 document.getElementById('summary-fee').innerText = (fee > 0) ? fee + ' ج' : 'مجاناً';
                 document.getElementById('cart-total-final').innerText = finalTotal.toFixed(2) + ' ج.م';
-                document.getElementById('sticky-total-price').innerText = finalTotal.toFixed(2) + ' ج.م';
+                
+                // هنا التعديل السحري: الشريط اللي تحت بيكتبلك قيمة المنتجات بس عشان الزبون ميتخضش
+                document.getElementById('sticky-total-price').innerText = itemsTotal + ' ج.م';
                 
                 let minOrderProg = document.getElementById('min-order-progress');
                 if(minOrderProg) {
