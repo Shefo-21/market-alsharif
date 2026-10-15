@@ -14,7 +14,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* --- الألوان الحديثة والمريحة --- */
         :root {
             --brand: #4F46E5; 
             --brand-dark: #3730A3; 
@@ -54,7 +53,6 @@
         .skel-img { height: 130px; width: 100%; border-radius: 12px; }
         .skel-text { height: 15px; width: 80%; border-radius: 8px; }
         .skel-price { height: 20px; width: 50%; border-radius: 8px; margin-top: auto; }
-        .skel-btn { height: 35px; width: 100%; border-radius: 20px; }
 
         .fly-item { position: fixed; z-index: 10000; width: 60px; height: 60px; object-fit: cover; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; }
         @keyframes cartPop { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 60% { transform: scale(0.9); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
@@ -68,7 +66,7 @@
         .sticky-details { display: flex; flex-direction: column; }
         .sticky-count { font-size: 12px; color: var(--text-muted); font-weight: 700; }
         .sticky-total { font-size: 18px; font-weight: 900; color: var(--brand); }
-        .sticky-btn { background: var(--brand-secondary); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-family: 'Cairo'; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); position: relative; overflow: hidden; }
+        .sticky-btn { background: var(--brand-secondary); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-family: 'Cairo'; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3); position: relative; overflow: hidden; }
 
         .search-container { position: relative; flex: 1; max-width: 350px; }
         .search-box { background: var(--bg-body); border-radius: 30px; display: flex; align-items: center; padding: 5px 15px; border: 1px solid var(--border-light); transition: 0.3s; z-index: 101; position: relative; }
@@ -78,6 +76,7 @@
         .live-search-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); box-shadow: var(--shadow-md); border-radius: 20px; border: 1px solid var(--border-light); z-index: 100; max-height: 350px; overflow-y: auto; display: none; margin-top: 10px; padding: 10px; }
         .search-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: 0.2s; border-radius: 12px; }
         .search-item:hover { background: var(--bg-body); }
+        .search-item:last-child { border-bottom: none; }
         .search-item img { width: 45px; height: 45px; object-fit: contain; border-radius: 8px; background: white; border: 1px solid var(--border-light); }
         .search-item-info { display: flex; flex-direction: column; flex: 1; }
         .search-item-title { font-size: 13px; font-weight: 800; color: var(--text-main); line-height: 1.3; }
@@ -140,8 +139,8 @@
         
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; backdrop-filter: blur(3px); cursor: pointer; }
         
-        #cart-modal, #admin-modal, #auth-modal { display: none; position: fixed; top: 0; left: 0; background: var(--bg-card); padding: 30px; width: 100%; max-width: 450px; height: 100%; z-index: 1001; overflow-y: auto; box-sizing: border-box; color: var(--text-main); }
-        #admin-modal, #auth-modal { height: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 20px; box-shadow: var(--shadow-md); padding: 25px; max-height: 90vh; }
+        #cart-modal, #auth-modal { display: none; position: fixed; top: 0; left: 0; background: var(--bg-card); padding: 30px; width: 100%; max-width: 450px; height: 100%; z-index: 1001; overflow-y: auto; box-sizing: border-box; color: var(--text-main); }
+        #auth-modal { height: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 20px; box-shadow: var(--shadow-md); padding: 25px; max-height: 90vh; }
 
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-light); padding-bottom: 20px; margin-bottom: 20px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--bg-body); padding: 12px; border-radius: 15px; border: 1px solid var(--border-light); }
@@ -189,12 +188,12 @@
     <header>
         <div class="logo-wrapper">
             <a href="#" class="logo" id="site-logo">مكتبة الشريف<span>.</span></a>
-            <div class="admin-name" id="admin-trigger" title="إدارة الماركت">إدارة مهندس شريف محمود</div>
+            <div class="admin-name" title="إدارة الماركت">إدارة مهندس شريف محمود</div>
         </div>
         
         <div class="search-container">
             <div class="search-box">
-                <input type="text" id="searchInput" oninput="liveSearch()" placeholder="ابحث باسم المنتج أو الكود...">
+                <input type="text" id="searchInput" oninput="liveSearch()" placeholder="ابحث باسم المنتج...">
                 <button>🔍</button>
             </div>
             <div class="live-search-dropdown" id="search-dropdown"></div>
@@ -202,8 +201,7 @@
 
         <div class="header-actions">
             <div id="shop-status-badge" style="font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 10px; background: #10b981; color: white;">🟢 مفتوح الآن</div>
-            <button class="action-icon-btn" onclick="toggleTheme()" id="themeBtn" title="الوضع الليلي">🌙</button>
-            <!-- زرار الدخول الجديد -->
+            <button class="action-icon-btn" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
             <button class="action-icon-btn" onclick="openAuthModal()" id="authBtn" title="حسابي">👤</button>
             <div class="cart-trigger" onclick="toggleCart()">
                 <span class="cart-icon">🛒</span>
@@ -264,7 +262,6 @@
     <div id="auth-modal">
         <h3 style="margin: 0 0 15px; color: var(--brand); font-weight: 900;">👤 تسجيل الدخول</h3>
         
-        <!-- الخطوة الأولى: إدخال البيانات -->
         <div id="auth-step-1">
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">لتأكيد هويتك وحماية الطلبات، يرجى إدخال بياناتك لإرسال كود التحقق (OTP).</p>
             <input type="text" id="auth-name" class="custom-input" placeholder="الاسم الكريم...">
@@ -272,7 +269,6 @@
             <button class="whatsapp-btn" onclick="sendOTP()" style="margin-top: 15px; background:var(--brand);">إرسال كود التحقق</button>
         </div>
 
-        <!-- الخطوة الثانية: إدخال الكود -->
         <div id="auth-step-2" style="display:none;">
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">تم إنشاء كود التحقق. برجاء إدخاله هنا للتأكيد:</p>
             <input type="number" id="auth-otp" class="custom-input" placeholder="كود التحقق (4 أرقام)..." style="text-align:center; font-size:20px; letter-spacing:5px;">
@@ -280,7 +276,6 @@
             <button onclick="resetAuth()" style="background: none; border: none; color: var(--brand); width: 100%; margin-top:10px; cursor:pointer; font-weight:bold;">تعديل رقم الموبايل</button>
         </div>
 
-        <!-- الخطوة الثالثة: تم الدخول -->
         <div id="auth-step-verified" style="display:none; text-align:center;">
             <div style="font-size:50px; margin-bottom:10px;">✅</div>
             <h3 style="color:#10b981;">تم التحقق بنجاح</h3>
@@ -311,13 +306,11 @@
         </div>
 
         <div id="checkout-section" style="display: none;">
-            <!-- رسالة طلب تسجيل الدخول لو مش مسجل -->
             <div id="unverified-checkout-msg" style="text-align:center; padding:20px; border:1px dashed var(--border-light); border-radius:15px; margin-top:15px;">
                 <p style="color:var(--text-muted); font-size:13px; font-weight:bold;">لا يمكنك إتمام الطلب قبل تأكيد رقم الموبايل (OTP).</p>
                 <button class="whatsapp-btn" style="background:var(--brand); padding:10px;" onclick="openAuthModal()">تسجيل الدخول لإتمام الطلب</button>
             </div>
 
-            <!-- نموذج الدفع بيظهر بس لو هو مسجل دخول -->
             <div id="verified-checkout-form" style="display:none;">
                 <textarea id="order-address" class="custom-input" rows="2" placeholder="العنوان بالتفصيل..." style="margin-top:15px;"></textarea>
                 
@@ -335,7 +328,6 @@
     <div id="toast"></div>
 
     <script>
-        // دالة التنبيهات
         function showToast(msg) {
             const t = document.getElementById("toast"); if(!t) return;
             t.innerText = msg; t.className = "show";
@@ -343,7 +335,7 @@
         }
 
         // ==========================================
-        //  نظام الدخول والتحقق (OTP) 
+        // نظام التوثيق (OTP)
         // ==========================================
         let generatedOTP = "";
         
@@ -369,11 +361,8 @@
             let phone = document.getElementById('auth-phone').value.trim();
             if(name.length < 2 || phone.length < 10) { showToast("⚠️ اكتب الاسم ورقم الموبايل بشكل صحيح"); return; }
             
-            // توليد كود عشوائي
             generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            // إظهاره للعميل (بسبب عدم وجود رصيد SMS مدفوع)
-            alert("تنبيه من إدارة المكتبة:\nلأن خدمة إرسال الـ SMS مدفوعة، سنعرض كود التحقق الخاص بك هنا لتجربة الموقع:\n\nكود التحقق الخاص بك هو: " + generatedOTP);
+            alert("تنبيه من إدارة المكتبة:\n\nكود التحقق الخاص بك هو: " + generatedOTP);
             
             document.getElementById('auth-step-1').style.display = 'none';
             document.getElementById('auth-step-2').style.display = 'block';
@@ -386,11 +375,10 @@
                 localStorage.setItem('customerName', document.getElementById('auth-name').value.trim());
                 localStorage.setItem('customerPhone', document.getElementById('auth-phone').value.trim());
                 
-                document.getElementById('authBtn').style.color = 'var(--brand)'; // تغيير لون الأيقونة
-                showToast("✅ تم التحقق وتسجيل الدخول بنجاح!");
+                document.getElementById('authBtn').style.color = 'var(--brand)';
+                showToast("✅ تم التحقق وتأكيد الدخول!");
                 closeModals();
                 
-                // لو هو كان فاتح السلة وبيحاول يطلب، هنفتحله السلة تاني عشان يكمل
                 if(cart.length > 0) toggleCart();
             } else {
                 showToast("❌ كود التحقق غير صحيح!");
@@ -411,8 +399,12 @@
         }
 
         // ==========================================
-        // باقي أكواد الموقع الطبيعية
+        //  تأثيرات الواجهة وتحميل المنتجات (الأنيميشن)
         // ==========================================
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+        }, { threshold: 0.1 });
+
         window.addEventListener('scroll', () => {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -422,7 +414,7 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let allProductsData = []; 
-        const phoneNumber = "201019267002";
+        const phoneNumber = "01019267002";
         let isMainViewActive = true;
 
         function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
@@ -464,6 +456,10 @@
 
                 if(allProductsData.length > 0) {
                     allProductsData.forEach(p => renderProduct(p.category, p.name, p.price, p.img, p.oldPrice, p.badge, p.stock, `grid-${p.category}`));
+                    
+                    // السطر السحري اللي كان ناقص ورجعتهولك عشان يظهر المنتجات!
+                    document.querySelectorAll('.product-card').forEach(card => revealObserver.observe(card));
+                    
                     let wrappers = document.getElementsByClassName("scrollspy-sec");
                     for (let i = 0; i < wrappers.length; i++) { wrappers[i].style.display = "block"; }
                 }
@@ -473,6 +469,7 @@
             }
         }
 
+        // باقي دوال الموقع
         function getActionHtml(name, price, stock, img) {
             const item = cart.find(i => i.name === name); const safeJsName = name.replace(/'/g, "\\'"); 
             if (item) {
@@ -500,9 +497,12 @@
             const safeDataName = name.replace(/"/g, "&quot;"); const safeJsName = name.replace(/'/g, "\\'"); 
             let badgeHtml = badge ? `<div class="badge">${badge}</div>` : '';
             let oldPriceHtml = oldPrice ? `<div class="old-price">${oldPrice} ج.م</div>` : '';
+            let isWished = wishlist.includes(name) ? 'active' : '';
+            
             grid.innerHTML += `
                 <div class="product-card" data-code="${name.toLowerCase()}">
                     ${badgeHtml}
+                    <button class="wishlist-btn ${isWished}" onclick="toggleWishlistAction('${safeJsName}', this)">❤️</button>
                     <div class="image-box"><img src="${img}" class="product-image-img" loading="lazy"></div>
                     <div class="product-info">
                         <h3>${name}</h3>
@@ -549,7 +549,7 @@
                 document.getElementById('checkout-section').style.display = 'block';
                 document.getElementById('sticky-bottom-bar').classList.add('show');
                 
-                // هنا السحر بتاع التوثيق: لو مش مسجل، إخفي الدفع واطلب التوثيق
+                // لو مش مسجل، إخفي الدفع واطلب التوثيق
                 if(localStorage.getItem('isVerified') === 'true') {
                     document.getElementById('unverified-checkout-msg').style.display = 'none';
                     document.getElementById('verified-checkout-form').style.display = 'block';
@@ -577,19 +577,52 @@
             let deliveryFee = (itemsTotal < 200) ? 15 : 0; let finalTotal = itemsTotal + deliveryFee;
             let address = document.getElementById('order-address').value.trim();
 
-            let message = `أهلاً مكتبة الشريف،\n🛒 طلب جديد\n👤 العميل: ${cName}\n📞 التليفون: ${phone}\n================\n`;
+            if(!address) { showToast("⚠️ برجاء كتابة العنوان بالتفصيل"); document.getElementById('order-address').focus(); return; }
+
+            let message = `أهلاً مكتبة الشريف،\n🛒 طلب جديد\n👤 العميل: ${cName}\n📞 التليفون: ${phone}\n📍 العنوان: ${address}\n================\n`;
             cart.forEach(item => { message += `▪️ ${item.name} (x${item.qty}) = ${item.price * item.qty} ج\n`; });
             message += `================\n📦 المنتجات = ${itemsTotal} ج\n🛵 التوصيل = ${(deliveryFee > 0) ? deliveryFee + ' ج' : 'مجاناً'}\n💰 النهائي = ${finalTotal.toFixed(2)} ج.م\n`;
-            if(address !== '') message += `📍 العنوان: ${address}\n`;
 
-            cart = []; saveCart(); updateCartUI(); closeModals();
-            window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            closeModals(); 
+            let succOverlay = document.getElementById('success-overlay');
+            if(succOverlay) {
+                succOverlay.classList.add('show');
+                setTimeout(() => {
+                    succOverlay.classList.remove('show');
+                    cart = []; saveCart(); updateCartUI();
+                    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                }, 1800);
+            }
         }
 
         function toggleCart() { const modal = document.getElementById('cart-modal'); if (modal.style.display === 'block') closeModals(); else { updateCartUI(); modal.style.display = 'block'; document.getElementById('overlay').style.display = 'block'; document.body.style.overflow = 'hidden'; } }
         function closeModals() { document.getElementById('cart-modal').style.display = 'none'; document.getElementById('auth-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; document.body.style.overflow = ''; }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
         function confirmEmptyCart() { cart = []; saveCart(); updateCartUI(); showToast("تم إفراغ السلة"); }
+
+        function toggleWishlistAction(name, btnElement) {
+            let index = wishlist.indexOf(name);
+            if (index === -1) { wishlist.push(name); btnElement.classList.add('active'); showToast('أضيفت للمفضلة ❤️'); } 
+            else { wishlist.splice(index, 1); btnElement.classList.remove('active'); showToast('حذفت من المفضلة 💔'); }
+            saveWishlist();
+        }
+
+        function filterByPrice() {
+            let maxPrice = parseInt(document.getElementById('priceRange').value);
+            document.getElementById('priceVal').innerText = maxPrice;
+            document.querySelectorAll('.product-card').forEach(card => {
+                let p = parseFloat(card.querySelector('.action-container').getAttribute('data-price'));
+                card.style.display = (p <= maxPrice) ? 'flex' : 'none';
+            });
+        }
+
+        function liveSearch() {
+            let val = document.getElementById('searchInput').value.toLowerCase().trim();
+            document.querySelectorAll('.product-card').forEach(card => {
+                let title = card.querySelector('h3').innerText.toLowerCase();
+                card.style.display = title.includes(val) ? 'flex' : 'none';
+            });
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('isVerified') === 'true') { document.getElementById('authBtn').style.color = 'var(--brand)'; }
