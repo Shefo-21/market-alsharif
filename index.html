@@ -10,9 +10,6 @@
     <meta name="author" content="المهندس شريف محمود">
     <meta name="theme-color" content="#4F46E5">
     
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3144/3144456.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -72,7 +69,7 @@
 
         .logo { font-size: 24px; font-weight: 900; color: var(--brand); text-decoration: none; }
         .logo span { color: var(--brand-secondary); }
-        .admin-name { font-size: 11px; color: var(--text-muted); font-weight: 800; background: var(--bg-body); padding: 2px 8px; border-radius: 10px; display: inline-block; border: 1px solid var(--border-light); cursor: default; user-select: none;}
+        .admin-name { font-size: 11px; color: var(--text-muted); font-weight: 800; background: var(--bg-body); padding: 2px 8px; border-radius: 10px; display: inline-block; border: 1px solid var(--border-light); cursor: pointer; user-select: none;}
         
         .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .action-icon-btn { background: var(--bg-body); border: 1px solid var(--border-light); color: var(--text-main); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: 0.3s; }
@@ -95,8 +92,9 @@
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
         
-        .product-card { background: var(--bg-card); border-radius: 22px; padding: 15px; box-shadow: var(--shadow-sm); border: 2px solid var(--border-light); display: flex; flex-direction: column; position: relative; transition: transform 0.3s ease, border-color 0.3s, box-shadow 0.3s; opacity: 1; }
-        .product-card:hover { transform: translateY(-5px); border-color: var(--brand); box-shadow: var(--shadow-md); z-index: 2; }
+        .product-card { background: var(--bg-card); border-radius: 22px; padding: 15px; box-shadow: var(--shadow-sm); border: 2px solid var(--border-light); display: flex; flex-direction: column; position: relative; transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s, box-shadow 0.3s; opacity: 0; transform: translateY(30px) scale(0.95); }
+        .product-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .product-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--brand); box-shadow: var(--shadow-md); z-index: 2; }
 
         .badge { position: absolute; top: 12px; right: 12px; background: var(--price-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .wishlist-btn { position: absolute; top: 12px; left: 12px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; color: var(--text-muted); transition: 0.3s; }
@@ -154,15 +152,6 @@
 
     <div id="scroll-progress"></div>
     <div id="elegant-welcome">🌸 مرحباً بكم في مكتبة الشريف 🌸</div>
-
-    <div id="success-overlay">
-        <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle cx="26" cy="26" r="25" fill="none" stroke="#10b981" stroke-width="3"/>
-            <path fill="none" stroke="#10b981" stroke-width="3" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-        </svg>
-        <h2 style="color:var(--text-main); font-weight:900;">تم تجهيز طلبك بنجاح!</h2>
-        <p style="color:var(--text-muted); font-weight:700;">جاري التحويل للواتساب...</p>
-    </div>
 
     <header>
         <div class="logo-wrapper">
@@ -298,7 +287,6 @@
     <div id="toast"></div>
 
     <script>
-        // حماية الموقع
         document.onkeydown = function(e) {
             if(e.keyCode == 123) { return false; } 
             if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) { return false; }
@@ -452,10 +440,14 @@
             document.getElementById("scroll-progress").style.width = ((winScroll / height) * 100) + "%";
         });
 
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+        }, { threshold: 0.1 });
+
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let allProductsData = []; 
-        const phoneNumber = "201019267002"; // الكود الصحيح
+        const phoneNumber = "201019267002";
 
         function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
         function saveWishlist() { localStorage.setItem('wishlist', JSON.stringify(wishlist)); }
@@ -496,6 +488,9 @@
 
                 if(allProductsData.length > 0) {
                     allProductsData.forEach(p => renderProduct(p.category, p.name, p.price, p.img, p.oldPrice, p.badge, p.stock, `grid-${p.category}`));
+                    document.querySelectorAll('.product-card').forEach(card => revealObserver.observe(card));
+                    let wrappers = document.getElementsByClassName("scrollspy-sec");
+                    for (let i = 0; i < wrappers.length; i++) { wrappers[i].style.display = "block"; }
                 }
                 updateCartUI(); 
             } catch (error) { 
