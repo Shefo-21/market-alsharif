@@ -17,17 +17,17 @@
     <style>
         /* === التصميم الاحترافي الجديد (Premium UI) === */
         :root {
-            --brand: #2563eb; /* أزرق ملكي احترافي */
+            --brand: #2563eb; 
             --brand-hover: #1d4ed8;
-            --brand-secondary: #f59e0b; /* عنبري دافئ للتنبيهات */
-            --price-color: #0f172a; /* لون السعر داكن وواضح */
+            --brand-secondary: #f59e0b; 
+            --price-color: #0f172a; 
             --success: #10b981;
             --danger: #ef4444;
-            --bg-body: #f8fafc; /* خلفية ناصعة ومريحة */
+            --bg-body: #f8fafc; 
             --bg-card: #ffffff;
             --text-main: #1e293b; 
             --text-muted: #64748b; 
-            --border-light: #e2e8f0; /* حدود ناعمة جداً */
+            --border-light: #e2e8f0; 
             --radius-card: 16px;
             --radius-btn: 8px;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); 
@@ -35,7 +35,6 @@
             --shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.08);
         }
 
-        /* الوضع الليلي المحسن */
         body.dark-mode {
             --bg-body: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc;
             --text-muted: #94a3b8; --border-light: #334155; --brand: #3b82f6;
@@ -53,11 +52,9 @@
 
         #elegant-welcome { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: white; padding: 12px 25px; border-radius: var(--radius-btn); box-shadow: var(--shadow-md); font-weight: 700; font-size: 14px; z-index: 9999; transition: 0.5s ease; text-align: center; white-space: nowrap; }
 
-        /* شريط التنبيهات العلوي */
         .fomo-banner { background: var(--danger); color: white; text-align: center; padding: 8px 15px; font-size: 13px; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .fomo-timer { background: white; color: var(--danger); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; font-weight: 800; }
 
-        /* الهيدر الاحترافي */
         header { background-color: var(--bg-card); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border-light); }
         
         .logo-wrapper { display: flex; flex-direction: column; }
@@ -65,7 +62,6 @@
         .logo span { color: var(--brand-secondary); }
         .admin-name { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: -3px; }
         
-        /* شريط البحث المودرن */
         .search-container { position: relative; flex: 1; max-width: 400px; }
         .search-box { background: var(--bg-body); border-radius: var(--radius-btn); display: flex; align-items: center; padding: 5px 15px; border: 1px solid var(--border-light); transition: 0.2s; }
         .search-box:focus-within { border-color: var(--brand); background: var(--bg-card); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
@@ -91,7 +87,6 @@
         .cart-trigger:hover { background: var(--brand-hover); }
         .cart-count { background: white; color: var(--brand); padding: 0px 6px; border-radius: 10px; font-weight: 800; font-size: 12px; }
 
-        /* شريط الأقسام الأنيق */
         .tabs-nav { background-color: var(--bg-card); padding: 12px 5%; display: flex; gap: 10px; overflow-x: auto; border-bottom: 1px solid var(--border-light); position: sticky; top: 76px; z-index: 90; scroll-behavior: smooth; }
         .tabs-nav::-webkit-scrollbar { display: none; }
         .tab-btn { background: var(--bg-body); border: 1px solid transparent; color: var(--text-muted); padding: 8px 18px; border-radius: 20px; font-family: 'Cairo'; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
@@ -105,7 +100,6 @@
         .section-wrapper { display: none; scroll-margin-top: 150px; } 
         .section-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin: 0 0 20px; border-bottom: 2px solid var(--border-light); padding-bottom: 10px; display: inline-block;}
 
-        /* كروت المنتجات الاحترافية */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
         
         .product-card { background: var(--bg-card); border-radius: var(--radius-card); padding: 15px; border: 1px solid var(--border-light); display: flex; flex-direction: column; position: relative; transition: 0.3s; }
@@ -120,60 +114,57 @@
         .product-image-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
         .product-info { display: flex; flex-direction: column; flex-grow: 1; }
-        .product-info h3 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; }
+        .product-info h3 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
         .price-row { margin-top: auto; display: flex; flex-direction: column; margin-bottom: 12px; }
         .old-price { font-size: 12px; color: var(--text-muted); text-decoration: line-through; margin-bottom: -3px; font-weight: 600; }
         .price { font-size: 18px; font-weight: 900; color: var(--price-color); }
         .price span { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-right: 2px;}
 
-        /* أزرار الإضافة والتعديل */
-        .add-btn { background: var(--bg-body); color: var(--brand); border: 1px solid var(--border-light); padding: 8px 15px; border-radius: var(--radius-btn); cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.2s; width: 100%; font-family: 'Cairo'; }
+        .add-btn { background: var(--bg-body); color: var(--brand); border: 1px solid var(--border-light); padding: 8px 15px; border-radius: var(--radius-btn); cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.2s; width: 100%; margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 5px; font-family: 'Cairo'; }
         .add-btn:hover { background: var(--brand); color: white; border-color: var(--brand); }
         
-        .qty-controller { display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); border: 1px solid var(--border-light); border-radius: var(--radius-btn); height: 36px; padding: 0 5px; }
+        .qty-controller { display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); border: 1px solid var(--border-light); border-radius: var(--radius-btn); height: 36px; padding: 0 5px; margin-top: 15px;}
         .qty-btn { background: transparent; border: none; color: var(--text-main); font-size: 18px; font-weight: bold; width: 30px; cursor: pointer; }
         .qty-btn:hover { color: var(--brand); }
         .qty-num { font-size: 14px; font-weight: 800; text-align: center; color: var(--brand); }
 
-        /* الشرايط والنوافذ */
-        .sticky-bottom-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150px); width: 90%; max-width: 400px; background: var(--text-main); color: white; padding: 12px 20px; border-radius: var(--radius-card); display: flex; justify-content: space-between; align-items: center; z-index: 990; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-hover); }
+        .sticky-bottom-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150px); width: 90%; max-width: 400px; background: var(--text-main); color: white; padding: 12px 20px; border-radius: var(--radius-card); display: flex; justify-content: space-between; align-items: center; z-index: 990; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-hover); }
         .sticky-bottom-bar.show { transform: translateX(-50%) translateY(0); }
         .sticky-details { display: flex; flex-direction: column; }
         .sticky-count { font-size: 12px; color: #94a3b8; font-weight: 600; }
         .sticky-total { font-size: 16px; font-weight: 800; color: white; }
-        .sticky-btn { background: var(--brand); color: white; border: none; padding: 8px 20px; border-radius: var(--radius-btn); font-family: 'Cairo'; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .sticky-btn { background: white; color: var(--text-dark); border: none; padding: 10px 20px; border-radius: 20px; font-family: 'Cairo'; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .sticky-btn:hover { transform: scale(1.05); }
 
         footer { background: var(--bg-card); padding: 30px 5% 80px; text-align: center; border-top: 1px solid var(--border-light); margin-top: 30px; }
         footer h2 { color: var(--text-main); font-weight: 800; margin: 0 0 5px; font-size: 20px; }
         footer p { color: var(--text-muted); font-weight: 600; font-size: 13px; margin: 0; }
 
-        #toast { visibility: hidden; min-width: 250px; background: var(--text-main); color: white; text-align: center; border-radius: var(--radius-btn); padding: 12px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: 600; opacity: 0; transition: 0.3s; font-size: 14px; box-shadow: var(--shadow-md); }
-        #toast.show { visibility: visible; opacity: 1; bottom: 90px; }
+        #toast { visibility: hidden; min-width: 250px; background: var(--text-main); color: white; text-align: center; border-radius: var(--radius-btn); padding: 12px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); font-weight: 600; opacity: 0; transition: 0.3s; font-size: 14px; box-shadow: var(--shadow-md); }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
         
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; backdrop-filter: blur(3px); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; backdrop-filter: blur(4px); }
+        #cart-modal, #auth-modal { display: none; position: fixed; top: 0; left: 0; background: var(--bg-body); width: 100%; max-width: 450px; height: 100%; z-index: 1001; overflow-y: auto; box-shadow: var(--shadow-hover); padding: 0; }
+        #auth-modal { height: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: var(--radius-card); padding: 25px; max-height: 90vh; background: var(--bg-card);}
         
-        #cart-modal, #auth-modal { display: none; position: fixed; top: 0; left: 0; background: var(--bg-body); padding: 0; width: 100%; max-width: 450px; height: 100%; z-index: 1001; overflow-y: auto; box-sizing: border-box; color: var(--text-main); }
-        #auth-modal { height: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: var(--radius-card); box-shadow: var(--shadow-hover); padding: 25px; max-height: 90vh; background: var(--bg-card);}
-
-        .cart-header { background: var(--bg-card); padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 10; }
+        .cart-header { background: var(--bg-card); padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); position: sticky; top:0; z-index: 10; }
         .cart-header h2 { margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); }
-        .close-icon { font-size: 24px; cursor: pointer; color: var(--text-muted); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: var(--bg-body); border-radius: 50%;}
+        .close-icon { background: var(--bg-body); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: var(--text-muted); }
 
         .cart-body-content { padding: 20px; }
-        .cart-item { display: flex; align-items: center; background: var(--bg-card); padding: 10px; border-radius: var(--radius-btn); margin-bottom: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+        .cart-item { display: flex; align-items: center; background: var(--bg-card); padding: 12px; border-radius: var(--radius-btn); margin-bottom: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
         .item-details { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; padding: 0 10px; }
         .item-name { font-weight: 700; font-size: 13px; color: var(--text-main); }
         .item-price { font-weight: 800; color: var(--brand); font-size: 14px; }
 
-        .custom-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-main); border-radius: var(--radius-btn); padding: 12px 15px; font-family: 'Cairo'; font-size: 13px; font-weight: 600; box-sizing: border-box; margin-top: 10px; outline: none; transition: 0.2s; }
-        .custom-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .custom-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-main); border-radius: var(--radius-btn); padding: 15px; font-family: 'Cairo'; font-size: 14px; font-weight: 600; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .custom-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
         
-        .whatsapp-btn { background: var(--success); color: white; border: none; width: 100%; padding: 14px; border-radius: var(--radius-btn); font-size: 15px; font-weight: 800; margin-top: 15px; font-family: 'Cairo'; cursor: pointer; transition: 0.2s; }
-        .whatsapp-btn:hover { background: #059669; }
-
+        .whatsapp-btn { background: var(--success); color: white; border: none; width: 100%; padding: 16px; border-radius: var(--radius-btn); font-size: 15px; font-weight: 800; font-family: 'Cairo'; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
+        .whatsapp-btn:hover { background: #059669; transform: translateY(-2px); }
         .empty-trash-btn { background: var(--bg-body); color: var(--danger); border: 1px solid var(--border-light); padding: 6px 12px; border-radius: var(--radius-btn); cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 12px; }
-        
+
         #success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
         body.dark-mode #success-overlay { background: rgba(15,23,42,0.95); }
         #success-overlay.show { opacity: 1; visibility: visible; }
@@ -181,7 +172,7 @@
 
         @media (max-width: 600px) {
             header { padding: 15px; }
-            .header-actions { width: 100%; justify-content: space-between; margin-top: 10px; }
+            .header-actions { width: 100%; justify-content: space-between; margin-top: 15px; }
             .search-container { width: 100%; max-width: 100%; }
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .product-card { padding: 12px; }
@@ -207,7 +198,7 @@
     <header>
         <div class="logo-wrapper">
             <a href="#" class="logo" id="site-logo">مكتبة الشريف<span>.</span></a>
-            <div class="admin-name" title="إدارة الماركت">إدارة مهندس شريف محمود</div>
+            <div class="admin-name">إدارة مهندس شريف محمود</div>
         </div>
         
         <div class="search-container">
@@ -246,7 +237,6 @@
     </div>
 
     <div class="container" id="main-container">
-        <!-- Loader -->
         <div id="skeleton-loader" class="product-grid">
             <div class="skel-card skeleton"><div class="skel-img skeleton"></div><div class="skel-text skeleton"></div><div class="skel-price skeleton"></div></div>
             <div class="skel-card skeleton"><div class="skel-img skeleton"></div><div class="skel-text skeleton"></div><div class="skel-price skeleton"></div></div>
@@ -287,7 +277,7 @@
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">لتأكيد هويتك وحماية الطلبات، يرجى إدخال بياناتك لإرسال كود التحقق (OTP) مجاناً.</p>
             <input type="text" id="auth-name" class="custom-input" placeholder="الاسم الكريم..." required>
             <input type="tel" id="auth-phone" class="custom-input" placeholder="رقم الموبايل (11 رقم)..." required>
-            <button class="whatsapp-btn" onclick="sendOTP()" style="background:var(--brand);">إرسال كود التحقق</button>
+            <button class="whatsapp-btn" onclick="sendOTP()">إرسال كود التحقق</button>
         </div>
 
         <div id="auth-step-2" style="display:none;">
@@ -343,7 +333,6 @@
 
     <div id="toast"></div>
 
-    <!-- نفس أكواد الجافاسكريبت الأصلية بدون أي تغيير -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -486,27 +475,39 @@
         window.addEventListener('scroll', () => {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            if(height > 0) document.getElementById("scroll-progress").style.width = ((winScroll / height) * 100) + "%";
-            
+            if(height > 0) {
+                document.getElementById("scroll-progress").style.width = ((winScroll / height) * 100) + "%";
+            }
+
             if (isMainViewActive) {
                 let current = 'all'; 
                 const sectionsList = document.querySelectorAll('.scrollspy-sec');
+                
                 sectionsList.forEach(sec => {
                     if (sec.style.display !== 'none') {
                         const sectionTop = sec.offsetTop;
-                        if (pageYOffset >= (sectionTop - 200)) { current = sec.getAttribute('id'); }
+                        if (pageYOffset >= (sectionTop - 200)) {
+                            current = sec.getAttribute('id');
+                        }
                     }
                 });
 
                 let tablinks = document.getElementsByClassName("tab-btn");
                 let activeChanged = false;
+                
                 for (let i = 0; i < tablinks.length; i++) {
                     let target = tablinks[i].getAttribute('data-target');
                     if (target) {
-                        if (tablinks[i].classList.contains("active") && target !== current) { tablinks[i].classList.remove("active"); }
-                        if (!tablinks[i].classList.contains("active") && target === current) { tablinks[i].classList.add("active"); activeChanged = tablinks[i]; }
+                        if (tablinks[i].classList.contains("active") && target !== current) {
+                            tablinks[i].classList.remove("active");
+                        }
+                        if (!tablinks[i].classList.contains("active") && target === current) {
+                            tablinks[i].classList.add("active");
+                            activeChanged = tablinks[i];
+                        }
                     }
                 }
+
                 if (activeChanged) {
                     let tabsNav = document.getElementById('main-tabs');
                     let linkLeft = activeChanged.offsetLeft;
@@ -632,7 +633,7 @@
                 const safeJsName = item.name.replace(/'/g, "\\'"); 
                 container.innerHTML += `
                     <div class="cart-item">
-                        <img src="${item.img}">
+                        <img src="${item.img}" style="width:55px; height:55px; object-fit:contain; border-radius:8px; margin-left:12px; background:white; border:1px solid #e2e8f0; padding:2px;">
                         <div class="item-details"><span class="item-name">${item.name}</span><span class="item-price">${item.price * item.qty} ج.م</span></div>
                         <div class="qty-controller" style="margin-top:0; width:90px;"><button class="qty-btn" onclick="decreaseQty('${safeJsName}')">-</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="addToCart('${safeJsName}', ${item.price}, ${item.stock}, '${item.img}')">+</button></div>
                     </div>
@@ -661,8 +662,9 @@
                 if(minOrderProg) {
                     let prog = (itemsTotal / 200) * 100;
                     if(prog > 100) prog = 100;
-                    if(prog === 100) { document.getElementById('min-order-text').innerHTML = "🎉 التوصيل أصبح مجاني!"; }
-                    else { document.getElementById('min-order-text').innerHTML = `باقي ${200 - itemsTotal} ج.م على التوصيل المجاني 🛵`; }
+                    minOrderProg.style.width = prog + '%';
+                    if(prog === 100) { document.getElementById('min-order-text').innerHTML = "🎉 مبروك! التوصيل مجاني"; }
+                    else { document.getElementById('min-order-text').innerHTML = `اطلب بـ 200 ج.م لتوصيل مجاني 🛵 (باقي ${200 - itemsTotal} ج.م)`; }
                 }
             }
 
@@ -674,7 +676,7 @@
 
         function sendToWhatsApp() {
             if(localStorage.getItem('isVerified') !== 'true') {
-                showToast("⚠️ يجب تسجيل الدخول أولاً");
+                showToast("⚠️ يجب تسجيل الدخول وتأكيد رقمك أولاً");
                 openAuthModal();
                 return;
             }
