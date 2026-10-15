@@ -10,9 +10,7 @@
     <meta name="author" content="المهندس شريف محمود">
     <meta name="theme-color" content="#4F46E5">
     
-    <!-- لوجو الموقع اللي بيظهر في التاب فوق -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3144/3144456.png">
-    
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3144/3144456.png">
     
@@ -194,7 +192,7 @@
             <div id="shop-status-badge" style="font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 10px; background: #10b981; color: white;">🟢 مفتوح الآن</div>
             <button class="action-icon-btn" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
             <button class="action-icon-btn" onclick="openAuthModal()" id="authBtn" title="حسابي">👤</button>
-            <!-- الأيقونة تفتح السلة فوراً للمراجعة بدون تسجيل دخول -->
+            <!-- السلة بتفتح مباشرة من غير أي شروط عشان الزبون يشوف بضاعته -->
             <div class="cart-trigger" onclick="toggleCart()">
                 <span class="cart-icon">🛒</span>
                 <div class="cart-count" id="cart-count">0</div>
@@ -239,13 +237,13 @@
         </div>
     </div>
 
-    <!-- الشريط السفلي الثابت يفتح السلة ولا يسأل عن تسجيل الدخول -->
+    <!-- الشريط السفلي يفتح السلة مباشرة بدون شروط -->
     <div id="sticky-bottom-bar" class="sticky-bottom-bar">
         <div class="sticky-details">
             <span class="sticky-count">إجمالي طلبك:</span>
             <span class="sticky-total" id="sticky-total-price">0 ج.م</span>
         </div>
-        <button class="sticky-btn" onclick="toggleCart()">إتمام الطلب ➔</button>
+        <button class="sticky-btn" onclick="toggleCart()">مراجعة الطلب ➔</button>
     </div>
 
     <footer style="background: var(--bg-card); padding: 40px 5% 100px; text-align: center; border-top: 1px solid var(--border-light); margin-top:30px;">
@@ -308,8 +306,8 @@
                 <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border-light); font-weight:900; font-size:18px; color:var(--price-color);"><span>الإجمالي النهائي:</span><span id="cart-total-final">0 ج</span></div>
             </div>
             
-            <!-- حائط الصد: لو مش مسجل دخول، الزرار ده هيطلب منه يسجل قبل ما يبعت الأوردر -->
-            <button class="whatsapp-btn" onclick="processCheckoutClick()" style="margin-top:15px;">إرسال الطلب واعتماده</button>
+            <!-- حائط الصد: لو العميل مش مسجل، هيطلب منه يسجل قبل ما يبعت رسالة الواتساب -->
+            <button class="whatsapp-btn" onclick="sendToWhatsApp()" style="margin-top:15px;">إرسال الطلب واعتماده</button>
         </div>
     </div>
 
@@ -390,7 +388,7 @@
                 showToast("✅ تم التحقق وتأكيد الدخول!");
                 closeModals();
                 
-                // يفتح السلة تلقائي عشان يكمل شغله
+                // بعد التوثيق نرجع نفتح السلة للعميل عشان يكمل الأوردر
                 if(cart.length > 0) { toggleCart(); }
             } else {
                 showToast("❌ كود التحقق غير صحيح!");
@@ -410,19 +408,9 @@
             closeModals();
         }
 
-        // دالة حائط الصد موجودة جوه السلة على زرار "إرسال الطلب"
-        function processCheckoutClick() {
-            if(cart.length === 0) {
-                showToast("السلة فارغة!"); return;
-            }
-            if(localStorage.getItem('isVerified') !== 'true') {
-                showToast("⚠️ يجب تسجيل الدخول أولاً لإتمام الطلب");
-                openAuthModal();
-            } else {
-                sendToWhatsApp();
-            }
-        }
-
+        // ==========================================
+        //  التمرير والتنقل
+        // ==========================================
         let isMainViewActive = true;
         
         function openCategory(categoryName) {
@@ -516,6 +504,9 @@
             entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
         }, { threshold: 0.1 });
 
+        // ==========================================
+        //  تحميل المنتجات والسلة
+        // ==========================================
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let allProductsData = []; 
@@ -575,7 +566,7 @@
             if (item) {
                 return `<div class="qty-controller"><button class="qty-btn" onclick="decreaseQty('${safeJsName}')">-</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="addToCart('${safeJsName}', ${price}, ${stock}, '${img}')">+</button></div>`;
             } else {
-                return `<button class="add-btn" onclick="addToCart('${safeJsName}', ${price}, ${stock}, '${img}')">أضف للسلة</button>`;
+                return `<button class="add-btn" onclick="addToCart('${safeJsName}', ${price}, ${stock}, '${img}')">🛒 أضف للسلة</button>`;
             }
         }
 
@@ -669,7 +660,14 @@
             });
         }
 
+        // إرسال الطلب (هنا حائط الصد الفعلي)
         function sendToWhatsApp() {
+            if(localStorage.getItem('isVerified') !== 'true') {
+                showToast("⚠️ يجب تسجيل الدخول وتأكيد رقمك أولاً");
+                openAuthModal();
+                return;
+            }
+            
             let phone = localStorage.getItem('customerPhone');
             let cName = localStorage.getItem('customerName');
             
@@ -695,6 +693,7 @@
             }
         }
 
+        // فتح السلة بحرية
         function toggleCart() { const modal = document.getElementById('cart-modal'); if (modal.style.display === 'block') closeModals(); else { updateCartUI(); modal.style.display = 'block'; document.getElementById('overlay').style.display = 'block'; document.body.style.overflow = 'hidden'; } }
         
         function closeModals() { 
