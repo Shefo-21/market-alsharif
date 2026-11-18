@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --brand:#1e4fd8; --brand-hover:#1a43b8; --brand-dark:#0b2447; --brand-soft:#eaf0fe; --accent:#f59e0b; --accent-dark:#d97706;
@@ -284,6 +285,29 @@ textarea.custom-input{resize:vertical}
 #account-modal.open{display:block}
 #account-modal h3{margin:0 0 8px;font-weight:900;font-size:20px}
 #account-modal .hint{font-size:13.5px;color:var(--muted);margin:0 0 16px;line-height:1.75}
+.google-section{border:1.5px solid var(--border);border-radius:14px;padding:16px 14px;margin:0 0 18px;background:var(--bg);text-align:center}
+.google-section h4{margin:0 0 6px;font-size:15px;font-weight:900}
+.google-section p{margin:0 0 12px;font-size:12.8px;color:var(--muted);line-height:1.75;font-weight:700}
+.google-divider{display:flex;align-items:center;gap:10px;margin:16px 0 14px;color:var(--muted);font-size:12.5px;font-weight:800}
+.google-divider::before,.google-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+#google-signin-btn{display:flex;justify-content:center;min-height:44px}
+#google-signin-btn > div{max-width:100%}
+.google-fallback-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f2937;border:1.5px solid #dadce0;border-radius:10px;padding:11px 18px;font-size:14.5px;font-weight:800;cursor:pointer;min-height:46px;font-family:inherit;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.google-fallback-btn:hover{border-color:#9ca3af;background:#f8fafc}
+body.dark-mode .google-fallback-btn{background:#fff}
+.google-status{display:none;margin-top:12px;background:#fffbeb;border:1.5px solid #fde68a;color:#92400e;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:800;line-height:1.7}
+body.dark-mode .google-status{background:#2a2110;color:#fcd34d;border-color:#57534e}
+.google-setup-note{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.7;font-weight:700;text-align:start;background:var(--card);border:1px dashed var(--border);border-radius:10px;padding:10px 12px}
+.google-profile{display:none;align-items:center;gap:12px;border:1.5px solid #a7f3d0;background:#ecfdf5;border-radius:14px;padding:12px;margin-bottom:16px;text-align:start}
+body.dark-mode .google-profile{background:#063f2e;border-color:#065f46}
+.google-profile.show{display:flex}
+.google-profile img{width:48px;height:48px;border-radius:50%;border:2px solid #fff;object-fit:cover;flex-shrink:0;background:#fff}
+.google-profile .gp-info{flex:1;min-width:0}
+.google-profile .gp-info strong{display:block;font-size:14.5px;font-weight:900;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.google-profile .gp-info span{display:block;font-size:12.5px;color:var(--muted);font-weight:700;direction:ltr;text-align:end;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.google-profile .gp-badge{font-size:11px !important;color:var(--success-dark) !important;direction:rtl !important;text-align:start !important}
+body.dark-mode .google-profile .gp-badge{color:#a7f3d0 !important}
+.google-signout{background:var(--card);border:1.5px solid var(--border);color:var(--danger);border-radius:9px;padding:8px 11px;font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap;min-height:38px;font-family:inherit}
 .save-btn{background:var(--brand);color:#fff;border:0;width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;min-height:51px}
 .save-btn:hover{background:var(--brand-hover)}
 .text-btn{background:none;border:0;color:var(--brand);width:100%;margin-top:10px;cursor:pointer;font-weight:800;padding:10px}
@@ -355,6 +379,8 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
   <div class="success-check" aria-hidden="true">✓</div>
   <h2 style="margin:0 0 6px;font-weight:900;font-size:21px">تم تجهيز طلبك بنجاح!</h2>
   <p style="color:var(--muted);font-weight:700;margin:0">جاري التحويل للواتساب لإرسال الطلب…</p>
+  <a id="success-wa-link" href="https://wa.me/201019267002" target="_blank" rel="noopener" style="display:none;margin-top:16px;background:#16a34a;color:#fff;padding:13px 24px;border-radius:12px;font-weight:900;text-decoration:none">💬 فتح واتساب وإرسال الطلب</a>
+  <p id="success-wa-hint" style="display:none;color:var(--muted);font-weight:700;margin:10px 0 0;font-size:13px">لو الواتساب مفتحش تلقائياً، اضغط الزرار اللي فوق.</p>
 </div>
 
 <header>
@@ -582,9 +608,34 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
 
 <!-- بيانات العميل -->
 <div id="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-title">
+  <!-- بطاقة حساب جوجل: بتظهر بعد تسجيل الدخول الناجح -->
+  <div id="google-profile" class="google-profile" aria-live="polite">
+    <img id="google-avatar" alt="" style="display:none" referrerpolicy="no-referrer">
+    <div class="gp-info">
+      <strong id="google-name">—</strong>
+      <span id="google-email">—</span>
+      <span class="gp-badge">✓ مسجل بحساب جوجل — الاسم والإيميل مؤكدين من جوجل</span>
+    </div>
+    <button type="button" class="google-signout" onclick="signOutGoogle()">خروج</button>
+  </div>
   <div id="account-form-view">
     <h3 id="account-title">بياناتك للطلب</h3>
     <p class="hint">اكتب اسمك ورقم موبايلك مرة واحدة — هيتحفظوا على جهازك بس عشان يتبعتوا مع طلبك على واتساب، ومش محتاج أي كود تأكيد.</p>
+
+    <!-- تسجيل الدخول بحساب جوجل (Google Identity Services) — جنب نموذج الاسم والموبايل، مش بداله -->
+    <div class="google-section" aria-labelledby="google-h">
+      <h4 id="google-h">تسجيل أسرع بحساب جوجل</h4>
+      <p>لو سجلت بجوجل، اسمك وإيميلك هيتملوا تلقائياً من حسابك. جوجل بيأكد الاسم والإيميل بس، ومش بيأكد رقم الموبايل — عشان كده خانة الموبايل لسه إلزامية لأن طلبك بيتبعت واتساب. وكمان: التحقق الكامل من جانب السيرفر مش موجود في موقع ثابت زي ده، فالتسجيل هنا بيسهّل تعبئة بياناتك ومش بديل عن تأكيد الموبايل.</p>
+      <div id="google-signin-btn" aria-label="زر تسجيل الدخول بحساب جوجل"></div>
+      <button type="button" id="google-fallback-btn" class="google-fallback-btn" onclick="onGoogleFallbackClick()" aria-label="سجل بحساب جوجل">
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>
+        <span>سجل بحساب جوجل</span>
+      </button>
+      <div id="google-status" class="google-status" role="status"></div>
+      <div class="google-setup-note">ملحوظة لصاحب المحل: زر جوجل مش هيشتغل لحد ما تبدّل قيمة <span dir="ltr" style="font-weight:900">YOUR_GOOGLE_CLIENT_ID</span> في ثابت <span dir="ltr" style="font-weight:900">GOOGLE_CLIENT_ID</span> أعلى الكود بالـ Client ID الحقيقي من Google Cloud، وتسجّل الدومين <span dir="ltr">https://shefo-21.github.io</span> كـ Authorized JavaScript origin. لحد ما ده يحصل، التسجيل بالاسم والموبايل شغال عادي.</div>
+    </div>
+
+    <div class="google-divider" aria-hidden="true"><span>أو سجّل بالاسم والموبايل</span></div>
     <label class="field-label" for="cust-name" style="margin-top:0">الاسم</label>
     <input type="text" id="cust-name" class="custom-input" placeholder="الاسم الكريم…" autocomplete="name">
     <label class="field-label" for="cust-phone" style="margin-top:2px">رقم الموبايل</label>
@@ -600,6 +651,7 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
       <p style="color:var(--muted);margin:4px 0 0;font-size:13.5px" id="welcome-phone"></p>
     </div>
     <button class="save-btn" onclick="editCustomer()">تعديل البيانات</button>
+    <button class="text-btn" id="google-link-hint" onclick="editCustomer()">ربط حساب جوجل (الاسم والإيميل بس — الموبايل لسه لازم يتكتب)</button>
     <button class="text-btn danger" onclick="clearCustomer()">مسح البيانات من الجهاز</button>
     <button class="text-btn" onclick="closeModals()">إغلاق</button>
   </div>
@@ -655,17 +707,87 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
 <script>
 (function(){
   "use strict";
+  /* =====================================================================
+     تسجيل الدخول بحساب جوجل — Google Identity Services (Sign in with Google)
+     =====================================================================
+     ⚠️ الـ Client ID اللي تحت ده قيمة نائبة (placeholder) — الزرار مش هيشتغل
+     لحد ما صاحب المحل يبدّلها بالـ Client ID الحقيقي من Google Cloud.
+
+     خطوات التفعيل لصاحب المحل:
+     1) اعمل OAuth Client ID من نوع Web application في Google Cloud Console
+        (APIs & Services → Credentials → Create Credentials → OAuth client ID).
+     2) سجّل في Authorized JavaScript origins العنوان ده بالظبط:
+        https://shefo-21.github.io
+     3) حط الـ Client ID الحقيقي مكان القيمة النائبة في الثابت اللي تحت
+        (GOOGLE_CLIENT_ID) — هو المكان الوحيد اللي محتاج يتغيّر في الكود.
+     4) ارفع الملف على جيت هب تاني (GitHub Pages) وجرّب من الموقع الحي،
+        لأن تسجيل جوجل بيشتغل على دومين HTTPS مسجّل بس، مش على ملف محلي.
+
+     تنبيه أمان وصدق: ده تسجيل من جهة المتصفح في موقع ثابت — جوجل بيأكد
+     الاسم والإيميل بس، ومش بيأكد رقم الموبايل، ومفيش تحقق كامل من جانب
+     السيرفر (Server-side verification) في موقع ثابت من غير سيرفر/Firebase.
+     ===================================================================== */
+  var GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+  function isGoogleConfigured(){
+    return !!GOOGLE_CLIENT_ID
+      && GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID')===-1
+      && /\.apps\.googleusercontent\.com$/.test(GOOGLE_CLIENT_ID);
+  }
   /* ====== Theme (persisted) ====== */
-  try{ if(localStorage.getItem('theme')==='dark'){ document.body.classList.add('dark-mode'); document.getElementById('themeBtn').textContent='☀️'; } }catch(e){}
+  function applyThemeIcon(){
+    var dark=document.body.classList.contains('dark-mode');
+    var btn=document.getElementById('themeBtn');
+    if(btn){ btn.textContent=dark?'☀️':'🌙'; btn.setAttribute('aria-pressed',dark?'true':'false'); }
+    try{ document.documentElement.style.colorScheme=dark?'dark':'light'; }catch(e){}
+  }
+  try{ if(localStorage.getItem('theme')==='dark'){ document.body.classList.add('dark-mode'); } }catch(e){}
+  applyThemeIcon();
   window.toggleTheme=function(){
     var dark=document.body.classList.toggle('dark-mode');
-    document.getElementById('themeBtn').textContent=dark?'☀️':'🌙';
+    applyThemeIcon();
     try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(e){}
+    showToast(dark?'تم تفعيل الوضع الليلي 🌙':'تم تفعيل الوضع النهاري ☀️');
   };
 
   /* ====== Helpers ====== */
-  var IMG_FALLBACK='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="300" height="200" fill="#eef2f7"/><text x="150" y="95" font-family="sans-serif" font-size="16" fill="#64748b" text-anchor="middle">مكتبة الشريف</text><text x="150" y="120" font-family="sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">صورة المنتج غير متاحة</text></svg>');
-  window.__imgFallback=function(el){ el.onerror=null; el.src=IMG_FALLBACK; };
+  function xmlEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  /* Placeholder واضح لكل منتج من غير صورة: اسم المنتج نفسه مكتوب بخط كبير ومقروء،
+     من غير اختراع أي صورة منتج — الصورة الحقيقية تيجي من الشيت لما تتضاف */
+  function placeholderFor(name){
+    var clean=String(name||'منتج').trim().replace(/\s+/g,' ');
+    var words=clean.split(' '), lines=[], line='';
+    words.forEach(function(w){
+      if((line+' '+w).trim().length>16&&line){ lines.push(line); line=w; } else { line=(line+' '+w).trim(); }
+      if(lines.length===2){ return; }
+    });
+    if(line&&lines.length<3) lines.push(line);
+    if(lines.length===0) lines=['منتج'];
+    var startY=lines.length===1?138:(lines.length===2?124:110);
+    var tspans='';
+    lines.slice(0,3).forEach(function(l,i){ tspans+='<tspan x="200" dy="'+(i===0?0:30)+'">'+xmlEsc(l)+'</tspan>'; });
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">'
+      +'<rect width="400" height="300" fill="#eaf0fe"/>'
+      +'<rect x="14" y="14" width="372" height="272" rx="18" fill="#ffffff" stroke="#c3d4f8" stroke-width="2"/>'
+      +'<circle cx="200" cy="72" r="27" fill="#0b2447"/><text x="200" y="82" font-family="sans-serif" font-size="26" fill="#f59e0b" text-anchor="middle" font-weight="bold">ش</text>'
+      +'<text x="200" y="'+startY+'" font-family="sans-serif" font-size="24" font-weight="bold" fill="#0b2447" text-anchor="middle">'+tspans+'</text>'
+      +'<text x="200" y="248" font-family="sans-serif" font-size="15" fill="#5b6b82" text-anchor="middle">صورة المنتج غير متاحة حالياً</text>'
+      +'<text x="200" y="272" font-family="sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">مكتبة الشريف</text></svg>';
+    return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+  }
+  var IMG_FALLBACK=placeholderFor('');
+  window.__placeholderFor=placeholderFor;
+  window.__imgFallback=function(el){
+    el.onerror=null;
+    var name='';
+    try{
+      var card=el.closest?el.closest('.product-card'):null;
+      if(card) name=card.getAttribute('data-name')||'';
+      if(!name) name=el.getAttribute('alt')||'';
+      var item=el.closest?el.closest('.cart-item'):null;
+      if(!name&&item){ var n=item.querySelector('.item-name'); if(n) name=n.textContent||''; }
+    }catch(e){}
+    el.src=placeholderFor(name);
+  };
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function escJs(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
   var toastTimer=null;
@@ -696,6 +818,7 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
   }
   window.openAccountModal=function(){
     closeModals();
+    renderGoogleProfile();
     var c=getCustomer();
     if(c.name&&c.phone){
       document.getElementById('account-form-view').style.display='none';
@@ -705,11 +828,14 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     }else{
       document.getElementById('account-form-view').style.display='block';
       document.getElementById('account-saved-view').style.display='none';
-      document.getElementById('cust-name').value=c.name||'';
+      var gUser=getGoogleUser();
+      document.getElementById('cust-name').value=c.name||(gUser?gUser.name:'')||'';
       document.getElementById('cust-phone').value=c.phone||'';
     }
     document.getElementById('account-modal').classList.add('open');
     var ov=document.getElementById('overlay'); ov.classList.add('show');
+    /* تهيئة زر جوجل الرسمي لو الـ Client ID حقيقي، أو إظهار الزرار البديل لو لسه نائب */
+    try{ initGoogleSignIn(); }catch(e){}
   };
   window.saveCustomer=function(){
     var name=document.getElementById('cust-name').value.trim();
@@ -731,6 +857,105 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     refreshAccountBtn(); showToast('تم مسح البيانات'); closeModals();
   };
 
+  /* ====== Google Sign-In (GIS) — الاسم والإيميل والصورة بس، من غير تحقق سيرفر ====== */
+  function getGoogleUser(){
+    try{
+      var name=localStorage.getItem('googleName')||'';
+      var email=localStorage.getItem('googleEmail')||'';
+      var picture=localStorage.getItem('googlePicture')||'';
+      return (name||email)? {name:name,email:email,picture:picture} : null;
+    }catch(e){ return null; }
+  }
+  function showGoogleStatus(msg){
+    var box=document.getElementById('google-status');
+    if(box){ box.textContent=msg; box.style.display='block'; }
+  }
+  window.renderGoogleProfile=function(){
+    var user=getGoogleUser();
+    var card=document.getElementById('google-profile');
+    if(!card) return;
+    if(user){
+      card.classList.add('show');
+      var nm=document.getElementById('google-name'); if(nm) nm.textContent=user.name||'عميل جوجل';
+      var em=document.getElementById('google-email'); if(em) em.textContent=user.email||'';
+      var av=document.getElementById('google-avatar');
+      if(av){ if(user.picture){ av.src=user.picture; av.style.display=''; } else { av.style.display='none'; } }
+      var hint=document.getElementById('google-link-hint'); if(hint) hint.style.display='none';
+    }else{
+      card.classList.remove('show');
+      var hint2=document.getElementById('google-link-hint'); if(hint2) hint2.style.display='';
+    }
+  };
+  /* لما الـ Client ID لسه نائب: رسالة واضحة، ومفيش أي كسر أو منع للطلب بالاسم والموبايل */
+  window.onGoogleFallbackClick=function(){
+    var msg='تسجيل جوجل لسه بيتظبط، سجل بالاسم والموبايل';
+    showGoogleStatus(msg+' — نموذج الاسم والموبايل تحت شغال عادي وتقدر تكمل طلبك بيه.');
+    showToast(msg);
+    var nameEl=document.getElementById('cust-name'); if(nameEl) nameEl.focus();
+  };
+  function decodeJwtPayload(token){
+    /* فكّ محتوى الـ ID token للعرض بس (الاسم/الإيميل/الصورة) — ده مش تحقق سيرفر،
+       والتحقق الحقيقي من التوقيع محتاج سيرفر أو Firebase ومش موجود في موقع ثابت */
+    try{
+      var part=String(token||'').split('.')[1]; if(!part) return null;
+      var b64=part.replace(/-/g,'+').replace(/_/g,'/');
+      while(b64.length%4) b64+='=';
+      var json=decodeURIComponent(atob(b64).split('').map(function(c){ return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
+      return JSON.parse(json);
+    }catch(e){ return null; }
+  }
+  window.handleGoogleCredential=function(response){
+    var payload=decodeJwtPayload(response&&response.credential);
+    if(!payload){ showGoogleStatus('حصلت مشكلة في قراءة بيانات جوجل، جرّب تاني أو سجل بالاسم والموبايل.'); return; }
+    var gName=payload.name||''; var gEmail=payload.email||''; var gPic=payload.picture||'';
+    try{
+      if(gName) localStorage.setItem('googleName',gName);
+      if(gEmail) localStorage.setItem('googleEmail',gEmail);
+      if(gPic) localStorage.setItem('googlePicture',gPic);
+      /* املأ اسم العميل في الطلب تلقائياً من جوجل — الموبايل يفضل يدوي وإلزامي */
+      if(gName) localStorage.setItem('customerName',gName);
+    }catch(e){}
+    var nameInput=document.getElementById('cust-name'); if(nameInput&&gName) nameInput.value=gName;
+    renderGoogleProfile(); refreshAccountBtn();
+    showGoogleStatus('أهلاً '+ (gName||'') +' — اتسجلت بجوجل وتم ملء اسمك تلقائياً. فاضل بس تكتب رقم موبايلك تحت وتحفظ البيانات، لأن الطلب بيتبعت واتساب وجوجل مش بيأكد الموبايل.');
+    showToast('✅ أهلاً بك، تم تسجيل الدخول بجوجل');
+    var phoneInput=document.getElementById('cust-phone'); if(phoneInput&&!phoneInput.value) phoneInput.focus();
+  };
+  var googleInitTried=false;
+  window.initGoogleSignIn=function(){
+    var fallback=document.getElementById('google-fallback-btn');
+    var container=document.getElementById('google-signin-btn');
+    if(!isGoogleConfigured()){
+      /* لسه نائب: اعرض الزرار البديل برسالة واضحة، ومتحاولش تهيّئ GIS بقيمة غلط */
+      if(container) container.innerHTML='';
+      if(fallback) fallback.style.display='inline-flex';
+      return;
+    }
+    if(fallback) fallback.style.display='none';
+    if(googleInitTried) return;
+    var tries=0;
+    (function tryInit(){
+      tries++;
+      if(window.google&&google.accounts&&google.accounts.id){
+        googleInitTried=true;
+        try{
+          google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: window.handleGoogleCredential, auto_select: false, cancel_on_tap_outside: true });
+          if(container){ container.innerHTML=''; google.accounts.id.renderButton(container,{ theme:'outline', size:'large', type:'standard', shape:'rectangular', text:'signin_with', logo_alignment:'left', width: 280, locale:'ar' }); }
+        }catch(e){ if(fallback) fallback.style.display='inline-flex'; }
+        return;
+      }
+      if(tries<20) setTimeout(tryInit,500);
+      else if(fallback){ fallback.style.display='inline-flex'; fallback.onclick=function(){ showGoogleStatus('مكتبة جوجل لسه محمّلتش — تأكد من الإنترنت وجرّب تاني، أو سجل بالاسم والموبايل.'); }; }
+    })();
+  };
+  window.signOutGoogle=function(){
+    try{ localStorage.removeItem('googleName'); localStorage.removeItem('googleEmail'); localStorage.removeItem('googlePicture'); }catch(e){}
+    try{ if(window.google&&google.accounts&&google.accounts.id) google.accounts.id.disableAutoSelect(); }catch(e){}
+    renderGoogleProfile();
+    showGoogleStatus('تم تسجيل الخروج من جوجل. بيانات الاسم والموبايل المحفوظة للطلب لسه موجودة لو كنت حافظها.');
+    showToast('تم تسجيل الخروج من جوجل');
+  };
+
   /* ====== State ====== */
   var cart=[]; var wishlist=[];
   try{ cart=JSON.parse(localStorage.getItem('cart'))||[]; }catch(e){ cart=[]; }
@@ -741,6 +966,29 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
   var currentQuickFilter='all';
   var currentCategory='all';
   var CATEGORY_IDS=['dairy','grocery','basics','drinks','snacks','detergents','beauty','library'];
+  /* ====== إزالة تكرار المنتجات (في الكود، مش في الشيت) ======
+     توحيد الاسم قبل المقارنة: شيل المسافات الزيادة (والمقارنة من غير مسافات خالص
+     عشان اختلافات زي "العروسه250جرام" و"العروسة 250 جرام" تتكشف)، وتوحيد
+     أ/إ/آ إلى ا، وة إلى ه، وى إلى ي. نفس الاسم الموحّد + نفس السعر = تكرار،
+     ويتعرض أول واحد بس — فالـ57 صف في الشيت بيبقوا 55 منتج فريد. */
+  function normalizeNameForDedupe(name){
+    return String(name==null?'':name)
+      .replace(/[أإآ]/g,'ا')
+      .replace(/ة/g,'ه')
+      .replace(/ى/g,'ي')
+      .replace(/\s+/g,'')
+      .trim()
+      .toLowerCase();
+  }
+  function dedupeProducts(list){
+    var seen={}, out=[];
+    (list||[]).forEach(function(p){
+      var key=normalizeNameForDedupe(p.name)+'|'+Number(p.price);
+      if(seen[key]) return;
+      seen[key]=true; out.push(p);
+    });
+    return out;
+  }
   function isPopularProduct(p){ var b=(p&&p.badge)?String(p.badge):''; return b.indexOf('الاكثر')>-1||b.indexOf('الأكثر')>-1; }
   function isOfferProduct(p){ var b=(p&&p.badge)?String(p.badge):''; return b.indexOf('عرض')>-1||!!(p&&p.oldPrice); }
   function categoryTotal(cat){ var n=0; allProductsData.forEach(function(p){ if(p.category===cat) n++; }); return n; }
@@ -769,6 +1017,15 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
       var shown=counts&&typeof counts[target]==='number'?counts[target]:total;
       btn.innerHTML=esc(label)+' <span class="tab-count">('+shown+')</span>';
     });
+  }
+  /* تحديث عدّاد تبويب المفضلة مباشرة من طول قائمة المفضلة — بيتنادى في نفس لحظة
+     الضغط على القلب، فالعدّاد بيزيد أو يقل فوراً من غير إعادة تحميل أو فتح التبويب */
+  function updateWishlistTabCount(){
+    var btn=document.querySelector('.tab-btn[data-target="wishlist"]');
+    if(!btn) return;
+    var label=btn.getAttribute('data-label')||'❤️ المفضلة';
+    btn.innerHTML=esc(label)+' <span class="tab-count">('+wishlist.length+')</span>';
+    btn.classList.remove('is-soon');
   }
   var phoneNumber='201019267002';
   var DELIVERY_FREE=true;
@@ -814,18 +1071,17 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     }
     document.getElementById('wishlist').style.display='none';
     applyFilters();
-    if(cat==='all'){ window.scrollTo({top:document.getElementById('shop').offsetTop-130,behavior:'smooth'}); }
-    else{
-      var target=document.getElementById(cat);
-      if(target&&target.style.display!=='none'){
-        var y=target.getBoundingClientRect().top+window.pageYOffset-145;
-        window.scrollTo({top:y,behavior:'smooth'});
-      }else if(target){
+    /* التبويب بيفلتر فعلياً: applyFilters بتعرض القسم المختار بس وتخفي الباقي
+       (و"كل المنتجات" بترجع تعرض الكل)، وبعدها نطلع لأعلى قسم المنتجات */
+    var shopEl=document.getElementById('shop');
+    if(shopEl){
+      var targetSec=document.getElementById(cat);
+      if(cat!=='all'&&targetSec&&targetSec.style.display==='none'){
         /* القسم اتصفّى لصفر نتائج بالفلاتر الحالية: امسح الفلاتر وافتحه */
-        clearAllFilters(true);
-        var y2=target.getBoundingClientRect().top+window.pageYOffset-145;
-        window.scrollTo({top:y2,behavior:'smooth'});
+        clearAllFilters(true,true);
       }
+      var y=shopEl.getBoundingClientRect().top+window.pageYOffset-145;
+      window.scrollTo({top:y,behavior:'smooth'});
     }
   };
 
@@ -854,13 +1110,20 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     if(currentCategory!=='all'&&currentCategory!=='wishlist'&&CATEGORY_IDS.indexOf(currentCategory)>-1&&categoryTotal(currentCategory)===0){ currentCategory='all'; document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-target')==='all'); }); isWishlistView=false; }
     applyFilters();
   };
-  window.clearAllFilters=function(silent){
+  window.clearAllFilters=function(silent,keepCategory){
     var s=document.getElementById('searchInput'); if(s) s.value='';
     var r=document.getElementById('priceRange'); if(r) r.value='500';
     var pv=document.getElementById('priceVal'); if(pv) pv.textContent='500';
     var so=document.getElementById('sortSelect'); if(so) so.value='default';
     currentQuickFilter='all';
     document.querySelectorAll('.quick-btn').forEach(function(b){ var on=b.getAttribute('data-quick')==='all'; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on); });
+    /* زرار "مسح كل الفلاتر" بيرجع لعرض كل المنتجات (كل الأقسام)،
+       إلا لو جاي من فتح تبويب معيّن فبنحافظ على القسم المختار */
+    if(!keepCategory){
+      currentCategory='all'; isWishlistView=false;
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-target')==='all'); });
+      var wl=document.getElementById('wishlist'); if(wl) wl.style.display='none';
+    }
     applyFilters();
     if(!silent) showToast('تم مسح كل الفلاتر — بيتعرض كل المنتجات');
   };
@@ -917,11 +1180,14 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
         var show=name.indexOf(q)>-1 && price<=maxPrice && cardMatchesQuick(card);
         card.style.display=show?'flex':'none'; if(show) visibleInSec++;
       });
-      sec.style.display=visibleInSec>0?'block':'none';
       counts[sec.id]=visibleInSec;
-      totalVisible+=visibleInSec;
+      /* فلترة التبويبات: لو مختار قسم معيّن، هو بس اللي يظهر وباقي الأقسام تتخفي،
+         و"كل المنتجات" (all) بتعرض كل الأقسام اللي فيها نتائج */
+      var isSelected=(currentCategory==='all'||currentCategory===sec.id);
+      sec.style.display=(isSelected&&visibleInSec>0)?'block':'none';
+      if(isSelected) totalVisible+=visibleInSec;
     });
-    counts.__all=totalVisible;
+    counts.__all=(currentCategory==='all')?totalVisible:allProductsData.length;
     counts.__wishlist=wishlist.length;
     document.getElementById('no-results').style.display=(totalVisible===0)?'block':'none';
     var rc=document.getElementById('results-count');
@@ -965,7 +1231,7 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     var outHtml=out?'<div class="out-badge">غير متوفر</div>':'';
     var oldHtml=p.oldPrice?'<div class="old-price">'+esc(p.oldPrice)+' ج.م</div>':'';
     var lowHtml=(!out&&p.stock>0&&p.stock<=10)?'<span class="low-stock">باقي '+p.stock+' بس</span>':'';
-    var imgSrc=p.img?p.img:IMG_FALLBACK;
+    var imgSrc=p.img?p.img:placeholderFor(p.name);
     if(typeof idx!=='number'){ idx=allProductsData.indexOf(p); if(idx<0) idx=0; }
     return '<article class="product-card'+(out?' is-out':'')+'" data-name="'+esc(p.name)+'" data-price="'+p.price+'" data-index="'+idx+'" data-offer="'+(isOfferProduct(p)?'1':'0')+'" data-popular="'+(isPopularProduct(p)?'1':'0')+'">'
       +badgeHtml+outHtml
@@ -1032,7 +1298,9 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     return list;
   }
   function applyProducts(list){
-    allProductsData=list;
+    /* إزالة الصفوف المكررة من الشيت (نفس الاسم الموحّد + نفس السعر) — بيتعرض أول صف بس،
+       فالعدادات والتبويبات بتتحسب على المنتجات الفريدة (55) مش عدد الصفوف (57) */
+    allProductsData=dedupeProducts(list);
     productsLoaded=true;
     document.getElementById('skeleton-loader').style.display='none';
     document.getElementById('load-error').style.display='none';
@@ -1099,7 +1367,7 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     for(var i=0;i<cart.length;i++){ if(cart[i].name===name) existing=cart[i]; }
     if(existing&&existing.qty+1>p.stock){ showToast('⚠️ المتاح حالياً '+p.stock+' قطعة فقط'); return; }
     if(!existing&&p.stock<1){ showToast('⚠️ المنتج غير متوفر'); return; }
-    if(existing){ existing.qty+=1; } else { cart.push({name:p.name,price:p.price,qty:1,stock:p.stock,img:p.img||IMG_FALLBACK}); }
+    if(existing){ existing.qty+=1; } else { cart.push({name:p.name,price:p.price,qty:1,stock:p.stock,img:p.img||placeholderFor(p.name)}); }
     saveCart(); updateCartUI(); showToast('تمت الإضافة للسلة 🛒');
   };
   window.decreaseQty=function(name){
@@ -1114,7 +1382,7 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     var html='';
     cart.forEach(function(item){
       totalCount+=item.qty; itemsTotal+=item.price*item.qty;
-      html+='<div class="cart-item"><img src="'+esc(item.img||IMG_FALLBACK)+'" alt="'+esc(item.name)+'" onerror="__imgFallback(this)">'
+      html+='<div class="cart-item"><img src="'+esc(item.img||placeholderFor(item.name))+'" alt="'+esc(item.name)+'" onerror="__imgFallback(this)">'
         +'<div class="item-details"><span class="item-name">'+esc(item.name)+'</span><span class="item-price">'+(item.price*item.qty)+' ج.م</span></div>'
         +'<div class="qty-controller"><button class="qty-btn" onclick="decreaseQty(\''+escJs(item.name)+'\')" aria-label="تقليل كمية '+esc(item.name)+'">−</button><span class="qty-num">'+item.qty+'</span><button class="qty-btn" onclick="addToCart(\''+escJs(item.name)+'\')" aria-label="زيادة كمية '+esc(item.name)+'">+</button></div></div>';
     });
@@ -1166,6 +1434,9 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
       }
     });
     if(isWishlistView){ renderWishlist(); applyFilters(); }
+    else if(productsLoaded){ applyFilters(); }
+    /* آخر خطوة: عدّاد المفضلة بيتحدّث لحظياً بعد أي إضافة أو حذف، بغض النظر عن الفلاتر أو القسم الحالي */
+    updateWishlistTabCount();
   };
 
   /* ====== Modals ====== */
@@ -1194,17 +1465,29 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
     var itemsTotal=0; cart.forEach(function(it){ itemsTotal+=it.price*it.qty; });
     var deliveryFee=0;
     var finalTotal=itemsTotal;
-    var message='أهلاً مكتبة الشريف،\n🛒 طلب جديد\n👤 العميل: '+c.name+'\n📞 التليفون: '+c.phone+'\n📍 العنوان:\n'+address+'\n================\n';
+    var gUserForOrder=getGoogleUser();
+    var message='أهلاً مكتبة الشريف،\n🛒 طلب جديد\n👤 العميل: '+c.name+'\n📞 التليفون: '+c.phone+(gUserForOrder&&gUserForOrder.email?'\n📧 الإيميل (من جوجل): '+gUserForOrder.email:'')+'\n📍 العنوان:\n'+address+'\n================\n';
     cart.forEach(function(item){ message+='▪️ '+item.name+' (x'+item.qty+') = '+(item.price*item.qty)+' ج\n'; });
     message+='================\n📦 المنتجات = '+itemsTotal+' ج\n🛵 التوصيل = مجاناً\n💰 النهائي = '+finalTotal.toFixed(2)+' ج.م\n';
     closeModals();
+    var waUrl='https://wa.me/'+phoneNumber+'?text='+encodeURIComponent(message);
     var ov=document.getElementById('success-overlay');
+    var waLink=document.getElementById('success-wa-link');
+    var waHint=document.getElementById('success-wa-hint');
+    /* رابط احتياطي ظاهر: لو المتصفح منع الفتح التلقائي، العميل يقدر يضغط بنفسه */
+    if(waLink){ waLink.href=waUrl; waLink.style.display='inline-flex'; }
+    if(waHint){ waHint.style.display='block'; }
     ov.classList.add('show');
     setTimeout(function(){
-      ov.classList.remove('show');
       cart=[]; saveCart(); updateCartUI();
-      window.open('https://wa.me/'+phoneNumber+'?text='+encodeURIComponent(message),'_blank');
+      var win=null;
+      try{ win=window.open(waUrl,'_blank'); }catch(e){ win=null; }
+      if(win){ ov.classList.remove('show'); if(waLink) waLink.style.display='none'; if(waHint) waHint.style.display='none'; }
+      /* لو الفتح التلقائي اتمنع، الشاشة تفضل ظاهرة بالرابط الاحتياطي لحد ما العميل يضغطه أو يقفلها بالضغط عليها */
     },1800);
+    ov.onclick=function(){
+      if(waLink&&waLink.style.display!=='none'){ ov.classList.remove('show'); waLink.style.display='none'; if(waHint) waHint.style.display='none'; ov.onclick=null; }
+    };
   };
 
   /* ====== Scroll progress + back to top ====== */
@@ -1220,6 +1503,7 @@ body.dark-mode #success-overlay{background:rgba(12,21,36,.97)}
   if(addrEl){ addrEl.addEventListener('input',function(){ saveAddress(addrEl.value); }); }
   loadSavedAddress();
   refreshAccountBtn();
+  try{ renderGoogleProfile(); }catch(e){}
   refreshCategoryTabs(null);
   updateCartUI();
   loadProducts();
