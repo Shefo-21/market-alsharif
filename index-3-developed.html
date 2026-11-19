@@ -297,8 +297,14 @@
         }
         async function fetchProductsFromSources() {
             const attempts = [];
+            // الافتراضي دلوقتي هو مشروع Supabase بتاع المكتبة — لو الإدارة حفظت اتصال فيه Supabase بتاعه هو اللي يمشي، غير كده الافتراضي هو اللي يشتغل
             const adminCfg = function () {
-                try { return JSON.parse(localStorage.getItem('maktab-admin-config-v1') || '{}'); } catch (e) { return {}; }
+                const defaults = { mode: 'supabase', sbUrl: 'https://lkfbowgrokfdxakvyxje.supabase.co', sbKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrZmJvd2dyb2tmZHhha3Z5eGplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwODUwNTAsImV4cCI6MjExMDY2MTA1MH0.BS2uCCs31bjouR2t7pZnRpV3YbL0OuXEM-Pfvn48ofI', sbTable: 'products', sbBucket: 'product-images', apiBase: '' };
+                try {
+                    const saved = JSON.parse(localStorage.getItem('maktab-admin-config-v1') || '{}');
+                    if (saved.sbUrl && saved.sbKey) return Object.assign({}, defaults, saved);
+                    return Object.assign({}, saved.apiBase ? { apiBase: saved.apiBase } : {}, defaults);
+                } catch (e) { return defaults; }
             }();
             const trySource = async function (label, fn) {
                 try {

@@ -198,10 +198,12 @@ let config = loadConfig();
 const $ = (id) => document.getElementById(id);
 
 function loadConfig() {
-  try {
-    return Object.assign({ mode: 'api', apiBase: 'http://localhost:5005', sbUrl: '', sbKey: '', sbTable: 'products', sbBucket: 'product-images' },
-      JSON.parse(localStorage.getItem(CFG_KEY) || '{}'));
-  } catch { return { mode: 'api', apiBase: 'http://localhost:5005', sbUrl: '', sbKey: '', sbTable: 'products', sbBucket: 'product-images' }; }
+  // الافتراضي دلوقتي هو مشروع Supabase بتاع المكتبة — لو فيه إعداد محفوظ فيه Supabase بتاعه هو اللي يمشي، غير كده الافتراضي هو اللي يشتغل
+  const defaults = { mode: 'supabase', apiBase: 'http://localhost:5005', sbUrl: 'https://lkfbowgrokfdxakvyxje.supabase.co', sbKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrZmJvd2dyb2tmZHhha3Z5eGplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwODUwNTAsImV4cCI6MjExMDY2MTA1MH0.BS2uCCs31bjouR2t7pZnRpV3YbL0OuXEM-Pfvn48ofI', sbTable: 'products', sbBucket: 'product-images' };
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch { saved = {}; }
+  if (saved.sbUrl && saved.sbKey) return Object.assign({}, defaults, saved);
+  return Object.assign({}, saved.apiBase ? { apiBase: saved.apiBase } : {}, defaults);
 }
 function saveConfig() { localStorage.setItem(CFG_KEY, JSON.stringify(config)); }
 function escapeHtml(v) {
