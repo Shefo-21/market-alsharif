@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة الشريف - المتجر الإلكتروني</title>
+    <style>
+        /* تصميم الموقع الأساسي - زي ما هو في ملفك الأصلي بالظبط */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        /* تصميم شبكة المنتجات */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        /* تصميم كارت المنتج */
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+        .product-image {
+            max-width: 100%;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .category {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .product-name {
+            font-size: 18px;
+            color: #333;
+            margin: 0 0 15px;
+        }
+        .price-section {
+            margin-bottom: 15px;
+        }
+        .new-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .old-price {
+            color: #95a5a6;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .add-to-cart-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #2980b9;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #34495e;
+            color: white;
+            margin-top: 50px;
+        }
+
+        /* ===== إضافات خفيفة بس، بنفس ألوان وشكل الملف الأصلي ===== */
+        /* شريط البحث والأقسام */
+        .toolbar {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .toolbar input, .toolbar select {
+            padding: 10px 12px;
+            font-size: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        .toolbar input { flex: 1; min-width: 200px; }
+        .count-line { color: #7f8c8d; font-size: 14px; margin: 0 0 15px; }
+        /* شريط السلة - نفس ألوان الموقع */
+        .cart-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            display: none;
+        }
+        .cart-bar.show { display: block; }
+        .cart-bar button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .cart-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+        .cart-panel.show { display: block; }
+        .cart-panel h3 { margin: 0 0 10px; }
+        .cart-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+        }
+        .cart-item .qty-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .cart-panel input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-family: inherit;
+        }
+        .in-cart { color: #27ae60; font-size: 14px; font-weight: bold; margin: 0 0 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- رأس الصفحة -->
+    <header>
+        <h1>مكتبة الشريف</h1>
+        <p>أفضل الأدوات المدرسية والمكتبية بأفضل الأسعار</p>
+    </header>
+
+    <!-- حاوية المنتجات -->
+    <div class="container">
+        <!-- بحث وأقسام - إضافة خفيفة فوق نفس الشبكة -->
+        <div class="toolbar">
+            <input type="search" id="search-input" placeholder="ابحث عن منتج...">
+            <select id="category-select">
+                <option value="الكل">كل الأقسام</option>
+            </select>
+        </div>
+        <p class="count-line" id="count-line"></p>
+
+        <!-- السلة - بتظهر لما تضيف حاجة، بنفس شكل الموقع -->
+        <div class="cart-bar" id="cart-bar">
+            <span id="cart-summary"></span>
+            <button type="button" id="show-cart-btn">عرض السلة</button>
+        </div>
+        <div class="cart-panel" id="cart-panel">
+            <h3>سلة المشتريات</h3>
+            <div id="cart-items"></div>
+            <p id="cart-total" style="font-weight: bold; font-size: 18px;"></p>
+            <input id="customer-name" placeholder="الاسم">
+            <input id="customer-phone" placeholder="رقم الموبايل (01xxxxxxxxx)" dir="ltr" style="text-align: right;">
+            <button type="button" id="whatsapp-order-btn" class="add-to-cart-btn" style="background-color: #27ae60;">إتمام الطلب على واتساب</button>
+        </div>
+
+        <!-- المكان ده فاضي، الجافاسكريبت هيملاه بالمنتجات اللي جاية من السيرفر -->
+        <div id="products-container" class="products-grid">
+            <h3 style="text-align: center; width: 100%; color: #7f8c8d;">جاري تحميل المنتجات من السيرفر...</h3>
+        </div>
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <footer>
+        <p>للتواصل وطلبات الجملة: 01019267002</p>
+        <p>مكتبة الشريف © 2026</p>
+    </footer>
+
+    <!-- كود الجافاسكريبت للربط بالسيرفر (مكتوب جوه الـ HTML عشان متتلخبطش) -->
+    <script>
+        // رابط السيرفر بتاعنا اللي شغال على جهازك - زي ما هو بالظبط
+        const apiUrl = 'http://localhost:5005/api/Products';
+
+        // مصادر المنتجات بالترتيب: إعدادات الإدارة (Supabase أو API) أولاً،
+        // وبعدين الموقع الحي (Google Sheet) اللي شغال من أي مكان، وبعدين السيرفر المحلي
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTx5Eb8TrIetChYvqRo4DGD25jP0y8JV-nDRGnVHRPqI-yLwcOMni1OYY9Grej9fefdROet_5I4Luj_/pub?output=csv';
+        const SHEET_CATS = { dairy: 'ألبان وأجبان', grocery: 'زيت وبقالة', basics: 'مكرونة وأرز', drinks: 'مشروبات', detergents: 'منظفات', beauty: 'عالم الجمال', library: 'مكتبة', snacks: 'سناكس وحلويات' };
+
+        function fetchWithTimeout(url, options, ms) {
+            const controller = new AbortController();
+            const timeout = setTimeout(function () { controller.abort(); }, ms || 8000);
+            return fetch(url, Object.assign({ signal: controller.signal }, options || {})).finally(function () { clearTimeout(timeout); });
+        }
+        function parseCSV(text) {
+            const rows = [];
+            let row = [], field = '', inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                if (inQuotes) {
+                    if (c === '"') {
+                        if (text[i + 1] === '"') { field += '"'; i++; }
+                        else inQuotes = false;
+                    } else field += c;
+                } else if (c === '"') inQuotes = true;
+                else if (c === ',') { row.push(field); field = ''; }
+                else if (c === '\n' || c === '\r') {
+                    if (c === '\r' && text[i + 1] === '\n') i++;
+                    row.push(field); field = '';
+                    if (row.some(function (v) { return String(v).trim() !== ''; })) rows.push(row);
+                    row = [];
+                } else field += c;
+            }
+            if (field !== '' || row.length) { row.push(field); if (row.some(function (v) { return String(v).trim() !== ''; })) rows.push(row); }
+            return rows;
+        }
+        function sheetRowsToProducts(rows) {
+            const seen = {};
+            const out = [];
+            rows.slice(1).forEach(function (r) {
+                const name = (r[1] || '').trim();
+                if (!name) return;
+                const key = normalizeArabic(name).replace(/\s+/g, ' ');
+                if (seen[key]) return;
+                seen[key] = true;
+                const num = function (v) { const n = parseFloat(String(v || '').replace(',', '')); return isNaN(n) ? 0 : n; };
+                const stockRaw = (r[6] || '').trim();
+                out.push({
+                    id: out.length + 1,
+                    name: name,
+                    category: SHEET_CATS[(r[0] || '').trim()] || (r[0] || '').trim() || 'عام',
+                    price: num(r[2]),
+                    oldPrice: num(r[4]),
+                    badge: (r[5] || '').trim() || null,
+                    imageUrl: (r[3] || '').trim() || null,
+                    isActive: true,
+                    stock: stockRaw === '' ? null : (isNaN(parseInt(stockRaw, 10)) ? null : parseInt(stockRaw, 10))
+                });
+            });
+            return out;
+        }
+        async function fetchProductsFromSources() {
+            const attempts = [];
+            const adminCfg = function () {
+                try { return JSON.parse(localStorage.getItem('maktab-admin-config-v1') || '{}'); } catch (e) { return {}; }
+            }();
+            const trySource = async function (label, fn) {
+                try {
+                    const data = await fn();
+                    if (!Array.isArray(data) || !data.length) throw new Error('الرد مش قائمة منتجات');
+                    return { products: data, sourceLabel: label };
+                } catch (err) {
+                    attempts.push(label + ': ' + (err && err.message ? err.message : 'فشل الاتصال'));
+                    return null;
+                }
+            };
+            let r;
+            if (adminCfg.mode === 'supabase' && adminCfg.sbUrl && adminCfg.sbKey) {
+                r = await trySource('Supabase', async function () {
+                    const res = await fetchWithTimeout(adminCfg.sbUrl.replace(/\/$/, '') + '/rest/v1/' + encodeURIComponent(adminCfg.sbTable || 'products') + '?select=*&order=id.asc', { headers: { 'apikey': adminCfg.sbKey, 'Authorization': 'Bearer ' + adminCfg.sbKey } }, 8000);
+                    if (!res.ok) throw new Error('كود ' + res.status);
+                    return res.json();
+                });
+                if (r) return r;
+            }
+            if (adminCfg.apiBase) {
+                r = await trySource('API (' + adminCfg.apiBase + ')', async function () {
+                    const res = await fetchWithTimeout(adminCfg.apiBase.replace(/\/$/, '') + '/api/Products', {}, 6000);
+                    if (!res.ok) throw new Error('كود ' + res.status);
+                    return res.json();
+                });
+                if (r) return r;
+            }
+            r = await trySource('الموقع الحي (Google Sheet)', async function () {
+                const res = await fetchWithTimeout(SHEET_CSV_URL + '&t=' + Date.now(), {}, 10000);
+                if (!res.ok) throw new Error('كود ' + res.status);
+                return sheetRowsToProducts(parseCSV(await res.text()));
+            });
+            if (r) return r;
+            r = await trySource('products.json', async function () {
+                const res = await fetchWithTimeout('products.json', {}, 5000);
+                if (!res.ok) throw new Error('كود ' + res.status);
+                return res.json();
+            });
+            if (r) return r;
+            r = await trySource('السيرفر المحلي (' + apiUrl + ')', async function () {
+                const res = await fetchWithTimeout(apiUrl, {}, 6000);
+                if (!res.ok) throw new Error('كود ' + res.status);
+                return res.json();
+            });
+            if (r) return r;
+            const err = new Error('مش قادر أوصل للمنتجات من أي مصدر');
+            err.attempts = attempts.join('\n');
+            throw err;
+        }
+
+        // صورة بديلة لو صورة المنتج بايظة (بدل موقع placeholder اللي كان بيعلق)
+        const fallbackImg = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="250" height="200"><rect width="100%" height="100%" fill="#ecf0f1"/><text x="50%" y="55%" font-size="18" text-anchor="middle" fill="#7f8c8d" font-family="Arial">بدون صورة</text></svg>');
+
+        let allProducts = [];
+        let cart = {};
+        try { cart = JSON.parse(localStorage.getItem('maktab-cart') || '{}') || {}; } catch (e) { cart = {}; }
+
+        // حماية من كسر الصفحة لو اسم المنتج فيه علامة تنصيص أو رمز
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+        // توحيد حروف العربي في البحث: أإآ -> ا، ة -> ه، ى -> ي
+        function normalizeArabic(text) {
+            return String(text || '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
+        }
+
+        function cartCount() {
+            let n = 0;
+            for (const id in cart) n += cart[id];
+            return n;
+        }
+        function cartTotal() {
+            let sum = 0;
+            for (const id in cart) {
+                const p = allProducts.find(function (x) { return String(x.id) === String(id); });
+                if (p) sum += Number(p.price || 0) * cart[id];
+            }
+            return sum;
+        }
+        function saveCart() { localStorage.setItem('maktab-cart', JSON.stringify(cart)); }
+
+        function updateCartBar() {
+            const bar = document.getElementById('cart-bar');
+            if (cartCount() === 0) { bar.classList.remove('show'); return; }
+            bar.classList.add('show');
+            document.getElementById('cart-summary').textContent =
+                'السلة: ' + cartCount() + ' منتج - الإجمالي: ' + cartTotal() + ' جنيه';
+            renderCartPanel();
+        }
+
+        function renderCartPanel() {
+            const box = document.getElementById('cart-items');
+            const lines = [];
+            for (const id in cart) {
+                const p = allProducts.find(function (x) { return String(x.id) === String(id); });
+                if (!p) continue;
+                lines.push(
+                    '<div class="cart-item"><span>' + escapeHtml(p.name) + ' - ' + p.price + ' جنيه</span>' +
+                    '<span><button type="button" class="qty-btn" data-dec="' + escapeHtml(p.id) + '">-</button> ' +
+                    cart[id] +
+                    ' <button type="button" class="qty-btn" data-inc="' + escapeHtml(p.id) + '">+</button></span></div>'
+                );
+            }
+            box.innerHTML = lines.join('') || '<p>السلة فاضية.</p>';
+            document.getElementById('cart-total').textContent = 'الإجمالي: ' + cartTotal() + ' جنيه - التوصيل مجاني';
+        }
+
+        function getFilteredProducts() {
+            const q = normalizeArabic(document.getElementById('search-input').value);
+            const cat = document.getElementById('category-select').value;
+            return allProducts.filter(function (p) {
+                if (cat !== 'الكل' && p.category !== cat) return false;
+                if (!q) return true;
+                return normalizeArabic((p.name || '') + ' ' + (p.category || '')).indexOf(q) !== -1;
+            });
+        }
+
+        function renderProducts() {
+            const productsContainer = document.getElementById('products-container');
+            const list = getFilteredProducts();
+            document.getElementById('count-line').textContent =
+                list.length ? ('عرض ' + list.length + ' منتج من أصل ' + allProducts.length) : '';
+
+            if (allProducts.length === 0) {
+                productsContainer.innerHTML = '<h3 style="text-align: center; width: 100%;">لا توجد منتجات متاحة حالياً.</h3>';
+                return;
+            }
+            if (list.length === 0) {
+                productsContainer.innerHTML = '<h3 style="text-align: center; width: 100%;">مفيش نتيجة مطابقة، جرّب كلمة تانية.</h3>';
+                return;
+            }
+
+            // رسم المنتجات - نفس كارتك الأصلي، بس من غير onclick بالاسم (كان بيكسر الصفحة لو الاسم فيه علامة تنصيص)
+            productsContainer.innerHTML = list.map(function (product) {
+                const inCart = cart[product.id] || 0;
+                return '<div class="product-card">' +
+                    (product.badge ? '<span class="badge">' + escapeHtml(product.badge) + '</span>' : '') +
+                    '<img src="' + escapeHtml(product.imageUrl || fallbackImg) + '" alt="' + escapeHtml(product.name) + '" class="product-image" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\'">' +
+                    '<div class="product-info">' +
+                    '<p class="category">' + escapeHtml(product.category) + '</p>' +
+                    '<h3 class="product-name">' + escapeHtml(product.name) + '</h3>' +
+                    '<div class="price-section">' +
+                    '<span class="new-price">' + product.price + ' جنيه</span>' +
+                    (product.oldPrice > 0 ? '<span class="old-price"><del>' + product.oldPrice + ' جنيه</del></span>' : '') +
+                    '</div>' +
+                    (inCart ? '<p class="in-cart">في السلة: ' + inCart + '</p>' : '') +
+                    '<button class="add-to-cart-btn" data-add="' + escapeHtml(product.id) + '">' +
+                    (inCart ? 'أضف واحد كمان' : 'أضف إلى السلة') +
+                    '</button>' +
+                    '</div></div>';
+            }).join('');
+        }
+
+        async function fetchAndDisplayProducts() {
+            const productsContainer = document.getElementById('products-container');
+
+            try {
+                // سحب البيانات - من مصدر الإدارة لو متظبط، وإلا من الموقع الحي، وإلا من السيرفر المحلي
+                const result = await fetchProductsFromSources();
+                const products = result.products;
+
+                allProducts = products.filter(function (p) { return p.isActive; });
+
+                // الأقسام من بيانات السيرفر نفسه
+                const select = document.getElementById('category-select');
+                const cats = ['الكل'];
+                allProducts.forEach(function (p) { if (p.category && cats.indexOf(p.category) === -1) cats.push(p.category); });
+                select.innerHTML = cats.map(function (c) { return '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>'; }).join('');
+
+                renderProducts();
+                updateCartBar();
+
+            } catch (error) {
+                console.error('الربط فشل:', error);
+                productsContainer.innerHTML = '<h3 style="text-align: center; width: 100%; color: #e74c3c;">عذراً، مش قادر أوصل للمنتجات من أي مصدر.</h3>' +
+                    '<p style="text-align: center; width: 100%; color: #7f8c8d; font-size: 13px; white-space: pre-line;">' + escapeHtml(error.attempts || error.message || '') + '</p>' +
+                    '<button type="button" class="add-to-cart-btn" style="max-width: 250px; margin: 0 auto;" data-retry="1">إعادة المحاولة</button>';
+            }
+        }
+
+        // تشغيل الدالة أول ما الصفحة تفتح
+        document.addEventListener('DOMContentLoaded', fetchAndDisplayProducts);
+
+        // دالة السلة - بقت سلة حقيقية محفوظة، مش alert بس
+        function addToCart(id) {
+            cart[id] = (cart[id] || 0) + 1;
+            saveCart();
+            updateCartBar();
+            renderProducts();
+        }
+
+        document.addEventListener('click', function (e) {
+            const add = e.target.closest('[data-add]');
+            if (add) { addToCart(add.getAttribute('data-add')); return; }
+            const inc = e.target.closest('[data-inc]');
+            if (inc) { const id = inc.getAttribute('data-inc'); cart[id] = (cart[id] || 0) + 1; saveCart(); updateCartBar(); renderProducts(); return; }
+            const dec = e.target.closest('[data-dec]');
+            if (dec) {
+                const id = dec.getAttribute('data-dec');
+                cart[id] = (cart[id] || 0) - 1;
+                if (cart[id] <= 0) delete cart[id];
+                saveCart(); updateCartBar(); renderProducts(); return;
+            }
+            if (e.target.closest('[data-retry]')) { fetchAndDisplayProducts(); return; }
+        });
+
+        document.getElementById('search-input').addEventListener('input', renderProducts);
+        document.getElementById('category-select').addEventListener('change', renderProducts);
+        document.getElementById('show-cart-btn').addEventListener('click', function () {
+            document.getElementById('cart-panel').classList.toggle('show');
+        });
+        document.getElementById('whatsapp-order-btn').addEventListener('click', function () {
+            if (cartCount() === 0) { alert('السلة فاضية'); return; }
+            const name = document.getElementById('customer-name').value.trim();
+            const phone = document.getElementById('customer-phone').value.trim();
+            if (!name) { alert('اكتب اسمك الأول'); return; }
+            if (!/^01[0-9]{9}$/.test(phone)) { alert('اكتب رقم موبايل صحيح يبدأ بـ 01 (11 رقم)'); return; }
+            const lines = [];
+            let i = 1;
+            for (const id in cart) {
+                const p = allProducts.find(function (x) { return String(x.id) === String(id); });
+                if (p) lines.push(i++ + '- ' + p.name + ' × ' + cart[id] + ' = ' + (Number(p.price) * cart[id]) + ' جنيه');
+            }
+            const now = new Date();
+            const orderCode = 'SH-' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '-' + String(Math.floor(1000 + Math.random() * 9000));
+            const msg = 'طلب جديد من موقع مكتبة الشريف\nكود الطلب: ' + orderCode + '\nالاسم: ' + name + '\nرقم الموبايل: ' + phone + '\n\n' +
+                lines.join('\n') + '\n\nالإجمالي: ' + cartTotal() + ' جنيه\nالتوصيل: مجاني';
+            window.open('https://wa.me/201019267002?text=' + encodeURIComponent(msg), '_blank');
+        });
+    </script>
+</body>
+</html>

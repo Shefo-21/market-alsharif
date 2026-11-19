@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة مكتبة الشريف</title>
+<meta name="description" content="لوحة إدارة منتجات مكتبة الشريف - إضافة وتعديل وحذف من الموبايل من أي مكان.">
+<meta name="theme-color" content="#2c3e50">
+<link rel="manifest" href="admin-manifest.json">
+<link rel="icon" href="admin-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="admin-icon.svg">
+<style>
+  /* نفس ألوان ملف المتجر الأصلي: رمادي غامق + أزرق + أخضر */
+  body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
+  header { background-color: #2c3e50; color: white; text-align: center; padding: 1.2rem 1rem; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; font-size: 13px; opacity: .9; }
+  .container { max-width: 900px; margin: 20px auto; padding: 0 15px 40px; }
+  .box { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+  .box h2 { margin: 0 0 10px; font-size: 18px; }
+  .box h3 { margin: 0 0 8px; font-size: 16px; }
+  label { display: block; font-size: 13px; font-weight: bold; margin: 10px 0 4px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+  input[type="checkbox"] { width: auto; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  .btn { background-color: #3498db; color: white; border: none; padding: 11px 18px; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: bold; font-family: inherit; }
+  .btn:hover { background-color: #2980b9; }
+  .btn-green { background-color: #27ae60; }
+  .btn-green:hover { background-color: #219150; }
+  .btn-danger { background-color: #e74c3c; }
+  .btn-danger:hover { background-color: #c0392b; }
+  .btn-outline { background: white; color: #2c3e50; border: 1px solid #2c3e50; }
+  .btn-small { padding: 7px 12px; font-size: 13px; }
+  .btn-block { width: 100%; margin-top: 12px; }
+  .msg { font-weight: bold; margin-top: 10px; }
+  .msg.ok { color: #27ae60; }
+  .msg.err { color: #e74c3c; }
+  .note { color: #7f8c8d; font-size: 13px; }
+  .status { font-weight: bold; }
+  .status.ok { color: #27ae60; }
+  .status.bad { color: #e74c3c; }
+  .product-row { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; flex-wrap: wrap; }
+  .product-row img { width: 56px; height: 56px; object-fit: contain; background: #f9fafb; border-radius: 4px; }
+  .product-row .info { flex: 1; min-width: 140px; }
+  .product-row .info b { display: block; }
+  .product-row .info small { color: #7f8c8d; }
+  .product-row .price-edit { display: flex; gap: 6px; align-items: center; }
+  .product-row .price-edit input { width: 90px; padding: 7px 8px; }
+  .toggle { border: 1px solid #27ae60; background: #eafaf1; color: #27ae60; border-radius: 999px; padding: 6px 12px; font-weight: bold; cursor: pointer; font-size: 13px; }
+  .toggle.off { border-color: #e74c3c; background: #fdecea; color: #e74c3c; }
+  #preview-img { max-width: 100%; max-height: 220px; display: none; margin-top: 10px; border-radius: 4px; }
+  .hidden { display: none; }
+  .lock-box { max-width: 420px; margin: 60px auto; text-align: center; }
+  .lock-box input { text-align: center; font-size: 20px; letter-spacing: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>إدارة مكتبة الشريف</h1>
+  <p>إضافة وتعديل المنتجات من الموبايل — من أي مكان</p>
+</header>
+
+<!-- شاشة القفل: PIN على الجهاز ده بس. الحماية الحقيقية بتيجي من تسجيل دخول السيرفر / Supabase Auth لما يتوصلوا -->
+<div class="container lock-box" id="lock-screen">
+  <div class="box">
+    <h2>🔒 لوحة الإدارة مقفولة</h2>
+    <p class="note" id="lock-text">اكتب رمز الدخول (PIN) بتاعك.</p>
+    <input type="password" id="pin-input" inputmode="numeric" placeholder="••••" autocomplete="off">
+    <button class="btn btn-green btn-block" type="button" id="unlock-btn">دخول</button>
+    <p class="msg err" id="lock-msg"></p>
+    <p class="note">أول مرة تفتح اللوحة على الجهاز ده هتثبّت PIN جديد. الـ PIN ده بيقفل الصفحة على جهازك بس، مش حماية سيرفر — لما توصل Supabase Auth أو تسجيل دخول الـ API هتبقى الحماية من السيرفر نفسه.</p>
+    <button class="btn btn-outline btn-small" type="button" id="reset-pin-btn">نسيت الـ PIN؟ امسح القفل من الجهاز ده</button>
+  </div>
+</div>
+
+<div class="container hidden" id="admin-screen">
+
+  <div style="text-align:left; margin-bottom: 10px;">
+    <button class="btn btn-outline btn-small" type="button" id="logout-btn">تسجيل خروج</button>
+  </div>
+
+  <div class="box hidden" id="readonly-banner" style="border:2px solid #c9a227; background:#fdf6d8;">
+    <b>وضع القراءة فقط:</b> المنتجات معروضة من الموقع الحي (Google Sheet) — الأقسام والأسعار ظاهرة. الإضافة والتعديل والحذف محتاجين مصدر كتابة متصل: وصّل Supabase من قسم الاتصال، أو شغّل سيرفر الـ API على جهازك.
+  </div>
+
+  <!-- الاتصال: اختار المسار -->
+  <section class="box">
+    <h2>الاتصال</h2>
+    <p><span class="status" id="conn-status">لم يتم الاختبار بعد</span> <span class="note" id="conn-detail"></span></p>
+    <label>المسار</label>
+    <select id="mode-select">
+      <option value="api">سيرفر ASP.NET الخاص بي (API)</option>
+      <option value="supabase">Supabase (سحابي، من غير سيرفر)</option>
+    </select>
+
+    <div id="api-settings">
+      <label>رابط السيرفر (API base) — مثال: https://اسم-موقعك.somee.com أو http://localhost:5005 وأنت على نفس الجهاز</label>
+      <input id="api-base-input" dir="ltr" style="text-align:left" placeholder="http://localhost:5005">
+      <p class="note">لما ترفع الـ API أونلاين، حط رابطه هنا من موبايلك واحفظه — المتجر والإدارة هيشتغلوا عليه فوراً من غير تغيير كود. ولازم الـ API يسمح بالـ CORS لنطاق صفحة الإدارة.</p>
+    </div>
+
+    <div id="supabase-settings" class="hidden">
+      <label>Supabase URL — مثال: https://xxxx.supabase.co</label>
+      <input id="sb-url-input" dir="ltr" style="text-align:left" placeholder="https://xxxx.supabase.co">
+      <label>Supabase anon key</label>
+      <input id="sb-key-input" type="password" dir="ltr" style="text-align:left" placeholder="eyJhbGciOi...">
+      <div class="row">
+        <div><label>اسم الجدول</label><input id="sb-table-input" value="products" dir="ltr" style="text-align:left"></div>
+        <div><label>اسم bucket الصور (اختياري)</label><input id="sb-bucket-input" value="product-images" dir="ltr" style="text-align:left"></div>
+      </div>
+      <p class="note">البيانات دي بتتحفظ في متصفح جهازك بس، مش جوه الملف. وجدول Supabase لازم يكون فيه نفس أعمدة الـ API: id, name, category, price, oldPrice, badge, imageUrl, isActive.</p>
+    </div>
+
+    <button class="btn btn-block" type="button" id="save-conn-btn">حفظ واختبار الاتصال</button>
+    <p class="msg" id="conn-msg"></p>
+  </section>
+
+  <!-- إضافة / تعديل منتج -->
+  <section class="box">
+    <h2 id="form-title">➕ إضافة منتج جديد</h2>
+    <form id="product-form">
+      <label>اسم المنتج *</label>
+      <input name="name" required placeholder="مثال: كراسة سلك 100 ورقة">
+
+      <div class="row">
+        <div>
+          <label>القسم *</label>
+          <select id="category-select" name="categorySelect"></select>
+          <input id="category-new" class="hidden" placeholder="اسم القسم الجديد" style="margin-top:8px">
+        </div>
+        <div>
+          <label>السعر (جنيه) *</label>
+          <input name="price" type="number" min="0" step="0.01" required placeholder="25">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>السعر قبل الخصم (اختياري)</label>
+          <input name="oldPrice" type="number" min="0" step="0.01" placeholder="30">
+        </div>
+        <div>
+          <label>شارة (اختياري)</label>
+          <input name="badge" placeholder="مثال: الأكثر مبيعاً">
+        </div>
+      </div>
+
+      <label>صورة المنتج — صوّر من موبايلك أو اختار من المعرض</label>
+      <input type="file" id="photo-input" accept="image/*">
+      <img id="preview-img" alt="معاينة الصورة">
+      <p class="note">الصورة بتتضغط تلقائياً على جهازك قبل الرفع (أقصى عرض 1000 بكسل). لو Supabase Storage متظبط، هتترفع عليه وتتحفظ كرابط؛ غير كده هتتحفظ جوه المنتج نفسه، أو تقدر تلزق رابط صورة يدوياً تحت.</p>
+      <label>أو رابط صورة يدوي (اختياري)</label>
+      <input name="imageUrl" type="text" dir="ltr" style="text-align:left" placeholder="https://...">
+
+      <button class="btn btn-green btn-block" type="submit" id="save-product-btn">حفظ المنتج</button>
+      <button class="btn btn-outline btn-block hidden" type="button" id="cancel-edit-btn">إلغاء التعديل</button>
+    </form>
+    <p class="msg" id="form-msg"></p>
+  </section>
+
+  <!-- قائمة المنتجات -->
+  <section class="box">
+    <h2>المنتجات</h2>
+    <input type="search" id="admin-search" placeholder="ابحث في المنتجات...">
+    <div style="margin-top:10px">
+      <button class="btn btn-small" type="button" id="refresh-btn">↻ تحديث القائمة</button>
+      <span class="note" id="products-count" style="margin-right:10px"></span>
+    </div>
+    <div id="products-list" style="margin-top:10px"><p class="note">لسه مفيش منتجات معروضة — احفظ الاتصال فوق الأول.</p></div>
+  </section>
+
+  <p class="note" style="text-align:center">عشان الطلبات تتسجل على السيرفر كمان (مش واتساب بس)، لازم الـ API يبقى فيه Endpoint للطلبات، مثال: POST /api/Orders يستقبل كود الطلب والاسم والموبايل والمنتجات والإجمالي. رسالة واتساب دلوقتي فيها كود طلب تلقائي.</p>
+</div>
+
+<script>
+/* ============================================================
+   إدارة مكتبة الشريف — admin.html (صفحة مستقلة عن المتجر)
+   مساران، تختار واحد من قسم "الاتصال":
+   1) api: سيرفر ASP.NET — GET/POST /api/Products، PUT/DELETE /api/Products/{id}
+   2) supabase: REST — GET/POST /rest/v1/{table}، PATCH/DELETE /rest/v1/{table}?id=eq.{id}
+   - الإعدادات بتتحفظ في localStorage على جهازك بس، مش جوه الملف
+   - القفل بـ PIN بيحمي الصفحة على جهازك بس؛ الحماية الحقيقية من السيرفر
+   ============================================================ */
+'use strict';
+
+const FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#ecf0f1"/><text x="50%" y="55%" font-size="16" text-anchor="middle" fill="#7f8c8d" font-family="Arial">بدون صورة</text></svg>');
+const PIN_KEY = 'maktab-admin-pin-v1';
+const SESSION_KEY = 'maktab-admin-session';
+const CFG_KEY = 'maktab-admin-config-v1';
+
+let products = [];
+let editingId = null;
+let pendingImageDataUrl = null; // صورة مضغوطة جاهزة للرفع / الحفظ
+let config = loadConfig();
+
+const $ = (id) => document.getElementById(id);
+
+function loadConfig() {
+  try {
+    return Object.assign({ mode: 'api', apiBase: 'http://localhost:5005', sbUrl: '', sbKey: '', sbTable: 'products', sbBucket: 'product-images' },
+      JSON.parse(localStorage.getItem(CFG_KEY) || '{}'));
+  } catch { return { mode: 'api', apiBase: 'http://localhost:5005', sbUrl: '', sbKey: '', sbTable: 'products', sbBucket: 'product-images' }; }
+}
+function saveConfig() { localStorage.setItem(CFG_KEY, JSON.stringify(config)); }
+function escapeHtml(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function normalizeArabic(t) {
+  return String(t || '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
+}
+function setMsg(el, text, ok) { el.textContent = text; el.className = 'msg ' + (ok === true ? 'ok' : ok === false ? 'err' : ''); }
+
+/* ---------- القفل بـ PIN ---------- */
+async function hashPin(pin) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('maktab-admin:' + pin));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch {
+    let h = 5381; for (let i = 0; i < pin.length; i++) h = ((h << 5) + h + pin.charCodeAt(i)) >>> 0;
+    return 'fallback-' + h.toString(16);
+  }
+}
+async function checkLock() {
+  const stored = localStorage.getItem(PIN_KEY);
+  if (sessionStorage.getItem(SESSION_KEY) === '1') { showAdmin(); return; }
+  $('lock-text').textContent = stored
+    ? 'اكتب رمز الدخول (PIN) بتاعك.'
+    : 'أول مرة: اختار PIN من 4 أرقام أو أكتر وثبّته — هيبقى رمز دخول اللوحة على الجهاز ده.';
+  $('lock-screen').classList.remove('hidden');
+}
+function showAdmin() {
+  $('lock-screen').classList.add('hidden');
+  $('admin-screen').classList.remove('hidden');
+  applyConfigToForm();
+  loadProducts();
+}
+$('unlock-btn').addEventListener('click', async () => {
+  const pin = $('pin-input').value.trim();
+  if (pin.length < 4) { $('lock-msg').textContent = 'الـ PIN لازم 4 أرقام أو أكتر.'; return; }
+  const stored = localStorage.getItem(PIN_KEY);
+  const hash = await hashPin(pin);
+  if (!stored) {
+    localStorage.setItem(PIN_KEY, hash);
+    sessionStorage.setItem(SESSION_KEY, '1');
+    showAdmin();
+  } else if (stored === hash) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    showAdmin();
+  } else {
+    $('lock-msg').textContent = 'PIN غلط، جرّب تاني.';
+  }
+});
+$('pin-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('unlock-btn').click(); });
+$('reset-pin-btn').addEventListener('click', () => {
+  if (!window.confirm('هتمسح قفل اللوحة من الجهاز ده، وهتثبّت PIN جديد أول ما تفتحها تاني. كمّل؟')) return;
+  localStorage.removeItem(PIN_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+});
+$('logout-btn').addEventListener('click', () => { sessionStorage.removeItem(SESSION_KEY); location.reload(); });
+
+/* ---------- الاتصال: API أو Supabase ---------- */
+function applyConfigToForm() {
+  $('mode-select').value = config.mode;
+  $('api-base-input').value = config.apiBase || '';
+  $('sb-url-input').value = config.sbUrl || '';
+  $('sb-key-input').value = config.sbKey || '';
+  $('sb-table-input').value = config.sbTable || 'products';
+  $('sb-bucket-input').value = config.sbBucket || 'product-images';
+  $('api-settings').classList.toggle('hidden', config.mode !== 'api');
+  $('supabase-settings').classList.toggle('hidden', config.mode !== 'supabase');
+}
+$('mode-select').addEventListener('change', () => {
+  config.mode = $('mode-select').value;
+  $('api-settings').classList.toggle('hidden', config.mode !== 'api');
+  $('supabase-settings').classList.toggle('hidden', config.mode !== 'supabase');
+});
+
+/* ---------- مصادر المنتجات (بالترتيب): مصدر كتابة متصل أولاً، وبعدين الموقع الحي ---------- */
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTx5Eb8TrIetChYvqRo4DGD25jP0y8JV-nDRGnVHRPqI-yLwcOMni1OYY9Grej9fefdROet_5I4Luj_/pub?output=csv';
+const SHEET_CATS = { dairy: 'ألبان وأجبان', grocery: 'زيت وبقالة', basics: 'مكرونة وأرز', drinks: 'مشروبات', detergents: 'منظفات', beauty: 'عالم الجمال', library: 'مكتبة', snacks: 'سناكس وحلويات' };
+let writeSource = null; // 'supabase' أو 'api' أو null (قراءة فقط من الموقع الحي)
+
+function fetchWithTimeout(url, options, ms) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms || 8000);
+  return fetch(url, Object.assign({ signal: controller.signal }, options || {})).finally(() => clearTimeout(timeout));
+}
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(field); field = '';
+      if (row.some(v => String(v).trim() !== '')) rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== '' || row.length) { row.push(field); if (row.some(v => String(v).trim() !== '')) rows.push(row); }
+  return rows;
+}
+function sheetRowsToProducts(rows) {
+  // أعمدة الشيت: القسم, اسم المنتج, السعر, رابط الصورة, السعر القديم, الشارة, الكمية المتاحة
+  const seen = {};
+  const out = [];
+  rows.slice(1).forEach(r => {
+    const name = (r[1] || '').trim();
+    if (!name) return;
+    const key = normalizeArabic(name).replace(/\s+/g, ' ');
+    if (seen[key]) return;
+    seen[key] = true;
+    const num = v => { const n = parseFloat(String(v || '').replace(',', '')); return isNaN(n) ? 0 : n; };
+    const stockRaw = (r[6] || '').trim();
+    out.push({
+      id: out.length + 1,
+      name,
+      category: SHEET_CATS[(r[0] || '').trim()] || (r[0] || '').trim() || 'عام',
+      price: num(r[2]),
+      oldPrice: num(r[4]),
+      badge: (r[5] || '').trim() || null,
+      imageUrl: (r[3] || '').trim() || null,
+      isActive: true,
+      stock: stockRaw === '' ? null : (isNaN(parseInt(stockRaw, 10)) ? null : parseInt(stockRaw, 10))
+    });
+  });
+  return out;
+}
+
+function sbHeaders(extra) {
+  return Object.assign({
+    'apikey': config.sbKey,
+    'Authorization': 'Bearer ' + config.sbKey,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  }, extra || {});
+}
+function sbBase() { return config.sbUrl.replace(/\/$/, ''); }
+
+async function apiFetch(path, options) {
+  // في وضع Supabase بنرجّع رد Supabase، وفي وضع API بنرجّع رد السيرفر
+  if (config.mode === 'supabase') {
+    const url = sbBase() + '/rest/v1/' + encodeURIComponent(config.sbTable) + path;
+    const res = await fetch(url, Object.assign({ headers: sbHeaders() }, options || {}));
+    return res;
+  }
+  const base = (config.apiBase || 'http://localhost:5005').replace(/\/$/, '');
+  const res = await fetch(base + '/api/Products' + path, options || {});
+  return res;
+}
+async function readJsonSafe(res) {
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+async function loadProducts() {
+  const status = $('conn-status');
+  const attempts = [];
+  const trySource = async (label, fn) => {
+    try {
+      const data = await fn();
+      if (!Array.isArray(data) || !data.length) throw new Error('الرد مش قائمة منتجات');
+      return { ok: true, label, data };
+    } catch (err) {
+      attempts.push(label + ': ' + (err && err.message ? err.message : 'فشل الاتصال'));
+      return { ok: false };
+    }
+  };
+
+  // 1) Supabase لو متظبط — قراءة وكتابة منه
+  if (config.mode === 'supabase' && config.sbUrl && config.sbKey) {
+    const r = await trySource('Supabase', async () => {
+      const res = await fetchWithTimeout(sbBase() + '/rest/v1/' + encodeURIComponent(config.sbTable) + '?select=*&order=id.asc', { headers: sbHeaders() }, 8000);
+      if (!res.ok) throw new Error('كود ' + res.status);
+      return readJsonSafe(res);
+    });
+    if (r.ok) return finishLoad(r, 'supabase');
+  }
+  // 2) الـ API بتاعك (محلي أو أونلاين) — لو شغال، القراءة والكتابة منه
+  const apiBase = (config.apiBase || '').trim();
+  if (apiBase) {
+    const r = await trySource('API (' + apiBase + ')', async () => {
+      const res = await fetchWithTimeout(apiBase.replace(/\/$/, '') + '/api/Products', {}, 6000);
+      if (!res.ok) throw new Error('كود ' + res.status);
+      return readJsonSafe(res);
+    });
+    if (r.ok) return finishLoad(r, 'api');
+  }
+  // 3) الموقع الحي — Google Sheet بتاعك، شغال من أي مكان ومن غير سيرفر (قراءة فقط)
+  const rSheet = await trySource('الموقع الحي (Google Sheet)', async () => {
+    const res = await fetchWithTimeout(SHEET_CSV_URL + '&t=' + Date.now(), {}, 10000);
+    if (!res.ok) throw new Error('كود ' + res.status);
+    return sheetRowsToProducts(parseCSV(await res.text()));
+  });
+  if (rSheet.ok) return finishLoad(rSheet, null);
+  // 4) نسخة المنتجات المحفوظة جنب الملف (قراءة فقط)
+  const rJson = await trySource('products.json', async () => {
+    const res = await fetchWithTimeout('products.json', {}, 5000);
+    if (!res.ok) throw new Error('كود ' + res.status);
+    return readJsonSafe(res);
+  });
+  if (rJson.ok) return finishLoad(rJson, null);
+
+  writeSource = null;
+  status.textContent = 'غير متصل ✕';
+  status.className = 'status bad';
+  $('conn-detail').textContent = '';
+  $('readonly-banner').classList.add('hidden');
+  $('products-list').innerHTML = '<p class="note">مش قادر أوصل للمنتجات من أي مصدر. اللي اتجرّب:</p><pre class="note" style="white-space:pre-wrap; text-align:left; direction:ltr;">' + escapeHtml(attempts.join('\n')) + '</pre>';
+}
+
+function finishLoad(result, writer) {
+  products = result.data.filter(p => p && p.isActive !== false);
+  writeSource = writer;
+  const status = $('conn-status');
+  status.textContent = 'متصل ✓ — المصدر: ' + result.label + ' (' + products.length + ' منتج)';
+  status.className = 'status ok';
+  $('conn-detail').textContent = '';
+  $('readonly-banner').classList.toggle('hidden', !!writer);
+  renderCategories();
+  renderProducts();
+}
+$('save-conn-btn').addEventListener('click', async () => {
+  config.mode = $('mode-select').value;
+  config.apiBase = $('api-base-input').value.trim() || 'http://localhost:5005';
+  config.sbUrl = $('sb-url-input').value.trim();
+  config.sbKey = $('sb-key-input').value.trim();
+  config.sbTable = $('sb-table-input').value.trim() || 'products';
+  config.sbBucket = $('sb-bucket-input').value.trim() || 'product-images';
+  saveConfig();
+  setMsg($('conn-msg'), 'بحفظ وبختبر الاتصال...', null);
+  await loadProducts();
+  setMsg($('conn-msg'), 'تم الحفظ. شوف حالة الاتصال فوق.', true);
+});
+$('refresh-btn').addEventListener('click', loadProducts);
+
+/* ---------- الأقسام ---------- */
+function renderCategories() {
+  const cats = [];
+  products.forEach(p => { if (p.category && cats.indexOf(p.category) === -1) cats.push(p.category); });
+  const sel = $('category-select');
+  const current = sel.value;
+  sel.innerHTML = cats.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('') +
+    '<option value="__new__">+ إضافة قسم جديد...</option>';
+  if (current && cats.indexOf(current) !== -1) sel.value = current;
+  $('category-new').classList.toggle('hidden', sel.value !== '__new__');
+}
+$('category-select').addEventListener('change', () => {
+  $('category-new').classList.toggle('hidden', $('category-select').value !== '__new__');
+  if ($('category-select').value === '__new__') $('category-new').focus();
+});
+
+/* ---------- الصورة: ضغط على الجهاز + رفع Supabase Storage لو متظبط ---------- */
+$('photo-input').addEventListener('change', () => {
+  const file = $('photo-input').files && $('photo-input').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 1000;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      pendingImageDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      const prev = $('preview-img');
+      prev.src = pendingImageDataUrl;
+      prev.style.display = 'block';
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+async function uploadImageIfNeeded() {
+  // بيرجع رابط الصورة النهائي: رابط Storage، أو رابط يدوي، أو Data URL مضغوطة
+  const manual = document.querySelector('#product-form [name="imageUrl"]').value.trim();
+  if (!pendingImageDataUrl) return manual || null;
+  if (config.mode === 'supabase' && config.sbUrl && config.sbKey && config.sbBucket) {
+    try {
+      const blob = await (await fetch(pendingImageDataUrl)).blob();
+      const filename = 'p-' + Date.now() + '-' + Math.floor(Math.random() * 10000) + '.jpg';
+      const res = await fetch(sbBase() + '/storage/v1/object/' + encodeURIComponent(config.sbBucket) + '/' + filename, {
+        method: 'POST',
+        headers: { 'apikey': config.sbKey, 'Authorization': 'Bearer ' + config.sbKey, 'Content-Type': 'image/jpeg' },
+        body: blob
+      });
+      if (!res.ok) throw new Error('رفع الصورة فشل بكود ' + res.status);
+      return sbBase() + '/storage/v1/object/public/' + encodeURIComponent(config.sbBucket) + '/' + filename;
+    } catch (err) {
+      alert('رفع الصورة على Supabase Storage فشل (' + err.message + ') — هحفظها جوه المنتج نفسه مؤقتاً.');
+      return pendingImageDataUrl;
+    }
+  }
+  if (config.mode === 'api') {
+    // من غير Storage مفيش مكان تترفع عليه الصورة غير جوه المنتج نفسه
+    return pendingImageDataUrl;
+  }
+  return pendingImageDataUrl;
+}
+
+/* ---------- حفظ منتج (إضافة / تعديل) ---------- */
+function readForm() {
+  const form = $('product-form');
+  const fd = new FormData(form);
+  let category = $('category-select').value;
+  if (category === '__new__') category = $('category-new').value.trim();
+  return {
+    name: String(fd.get('name') || '').trim(),
+    category,
+    price: Number(fd.get('price')),
+    oldPrice: Number(fd.get('oldPrice') || 0),
+    badge: String(fd.get('badge') || '').trim() || null,
+    imageUrl: String(fd.get('imageUrl') || '').trim() || null,
+    isActive: true
+  };
+}
+$('product-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = readForm();
+  if (!payload.name || !payload.category || !(payload.price >= 0)) {
+    setMsg($('form-msg'), '❌ كمّل الاسم والقسم والسعر الأول.', false);
+    return;
+  }
+  if (!writeSource) {
+    setMsg($('form-msg'), '❌ مفيش مصدر كتابة متصل — المنتجات معروضة من الموقع الحي بس. وصّل Supabase من قسم الاتصال، أو شغّل سيرفر الـ API على جهازك.', false);
+    return;
+  }
+  setMsg($('form-msg'), 'جاري الحفظ...', null);
+  try {
+    payload.imageUrl = await uploadImageIfNeeded();
+    let res;
+    if (editingId !== null) {
+      if (writeSource === 'supabase') {
+        res = await apiFetch('?id=eq.' + encodeURIComponent(editingId), { method: 'PATCH', headers: sbHeaders(), body: JSON.stringify(payload) });
+      } else {
+        res = await fetch((config.apiBase || '').replace(/\/$/, '') + '/api/Products/' + encodeURIComponent(editingId), {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ id: Number(editingId) || editingId }, payload))
+        });
+      }
+    } else {
+      if (writeSource === 'supabase') {
+        res = await apiFetch('', { method: 'POST', headers: sbHeaders(), body: JSON.stringify(payload) });
+      } else {
+        res = await fetch((config.apiBase || '').replace(/\/$/, '') + '/api/Products', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ id: 0 }, payload))
+        });
+      }
+    }
+    if (!res.ok) {
+      const body = await readJsonSafe(res);
+      setMsg($('form-msg'), '❌ السيرفر رفض الحفظ — كود ' + res.status + (typeof body === 'string' && body ? ' — ' + body.slice(0, 200) : ''), false);
+      return;
+    }
+    setMsg($('form-msg'), editingId !== null ? '✅ تم حفظ التعديل.' : '✅ تم حفظ المنتج.', true);
+    cancelEdit();
+    await loadProducts();
+  } catch (err) {
+    setMsg($('form-msg'), '❌ فشل الاتصال أثناء الحفظ: ' + (err && err.message ? err.message : 'خطأ غير معروف'), false);
+  }
+});
+function cancelEdit() {
+  editingId = null;
+  pendingImageDataUrl = null;
+  $('product-form').reset();
+  $('preview-img').style.display = 'none';
+  $('photo-input').value = '';
+  $('form-title').textContent = '➕ إضافة منتج جديد';
+  $('save-product-btn').textContent = 'حفظ المنتج';
+  $('cancel-edit-btn').classList.add('hidden');
+  $('category-new').classList.add('hidden');
+  renderCategories();
+}
+$('cancel-edit-btn').addEventListener('click', cancelEdit);
+
+/* ---------- قائمة المنتجات: بحث + سعر سريع + متاح/موقوف + تعديل/حذف ---------- */
+function renderProducts() {
+  const q = normalizeArabic($('admin-search').value);
+  const list = products.filter(p => !q || normalizeArabic((p.name || '') + ' ' + (p.category || '')).indexOf(q) !== -1);
+  $('products-count').textContent = list.length + ' منتج من أصل ' + products.length;
+  if (!list.length) { $('products-list').innerHTML = '<p class="note">مفيش منتجات مطابقة.</p>'; return; }
+  $('products-list').innerHTML = list.map(p => {
+    const active = p.isActive !== false;
+    return '<div class="product-row">' +
+      '<img src="' + escapeHtml(p.imageUrl || FALLBACK_IMG) + '" alt="" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">' +
+      '<div class="info"><b>' + escapeHtml(p.name) + '</b><small>' + escapeHtml(p.category || '') + (p.badge ? ' • ' + escapeHtml(p.badge) : '') + '</small></div>' +
+      '<div class="price-edit"><input type="number" min="0" step="0.01" value="' + escapeHtml(p.price) + '" data-price="' + escapeHtml(p.id) + '" aria-label="سعر سريع"> جنيه ' +
+      '<button class="btn btn-small" type="button" data-save-price="' + escapeHtml(p.id) + '">حفظ السعر</button></div>' +
+      '<button class="toggle' + (active ? '' : ' off') + '" type="button" data-toggle="' + escapeHtml(p.id) + '">' + (active ? '✓ متاح' : 'موقوف') + '</button>' +
+      '<button class="btn btn-outline btn-small" type="button" data-edit="' + escapeHtml(p.id) + '">تعديل</button>' +
+      '<button class="btn btn-danger btn-small" type="button" data-del="' + escapeHtml(p.id) + '">حذف</button>' +
+      '</div>';
+  }).join('');
+}
+$('admin-search').addEventListener('input', renderProducts);
+
+document.addEventListener('click', async (e) => {
+  const edit = e.target.closest('[data-edit]');
+  if (edit) { startEdit(edit.getAttribute('data-edit')); return; }
+  const del = e.target.closest('[data-del]');
+  if (del) { await deleteProduct(del.getAttribute('data-del')); return; }
+  const tog = e.target.closest('[data-toggle]');
+  if (tog) { await toggleActive(tog.getAttribute('data-toggle')); return; }
+  const sp = e.target.closest('[data-save-price]');
+  if (sp) { await saveQuickPrice(sp.getAttribute('data-save-price')); return; }
+});
+
+function startEdit(id) {
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) return;
+  editingId = p.id;
+  const form = $('product-form');
+  form.elements.name.value = p.name || '';
+  form.elements.price.value = p.price == null ? '' : p.price;
+  form.elements.oldPrice.value = p.oldPrice || '';
+  form.elements.badge.value = p.badge || '';
+  form.elements.imageUrl.value = (p.imageUrl && String(p.imageUrl).startsWith('data:')) ? '' : (p.imageUrl || '');
+  renderCategories();
+  if (products.some(x => x.category === p.category)) $('category-select').value = p.category;
+  $('category-new').classList.add('hidden');
+  pendingImageDataUrl = null;
+  $('preview-img').style.display = 'none';
+  $('form-title').textContent = '✏️ تعديل: ' + p.name;
+  $('save-product-btn').textContent = 'حفظ التعديل';
+  $('cancel-edit-btn').classList.remove('hidden');
+  document.querySelector('#product-form').scrollIntoView({ behavior: 'smooth' });
+}
+async function deleteProduct(id) {
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) return;
+  if (!writeSource) { alert('مفيش مصدر كتابة متصل — المنتجات معروضة من الموقع الحي بس. وصّل Supabase أو شغّل السيرفر.'); return; }
+  if (!window.confirm('تحذف "' + p.name + '" نهائياً؟')) return;
+  try {
+    let res;
+    if (writeSource === 'supabase') res = await apiFetch('?id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: sbHeaders() });
+    else res = await fetch((config.apiBase || '').replace(/\/$/, '') + '/api/Products/' + encodeURIComponent(id), { method: 'DELETE' });
+    if (!res.ok) { alert('السيرفر رفض الحذف — كود ' + res.status); return; }
+    await loadProducts();
+  } catch (err) { alert('فشل الاتصال أثناء الحذف: ' + err.message); }
+}
+async function toggleActive(id) {
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) return;
+  if (!writeSource) { alert('مفيش مصدر كتابة متصل — المنتجات معروضة من الموقع الحي بس. وصّل Supabase أو شغّل السيرفر.'); return; }
+  const next = !(p.isActive !== false);
+  try {
+    let res;
+    if (writeSource === 'supabase') {
+      res = await apiFetch('?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: sbHeaders(), body: JSON.stringify({ isActive: next }) });
+    } else {
+      const body = Object.assign({}, p, { isActive: next });
+      res = await fetch((config.apiBase || '').replace(/\/$/, '') + '/api/Products/' + encodeURIComponent(id), {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+    }
+    if (!res.ok) { alert('السيرفر رفض التغيير — كود ' + res.status); return; }
+    await loadProducts();
+  } catch (err) { alert('فشل الاتصال: ' + err.message); }
+}
+async function saveQuickPrice(id) {
+  const input = document.querySelector('[data-price="' + id + '"]');
+  const price = Number(input ? input.value : NaN);
+  if (!(price >= 0)) { alert('اكتب سعر صحيح الأول.'); return; }
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) return;
+  if (!writeSource) { alert('مفيش مصدر كتابة متصل — المنتجات معروضة من الموقع الحي بس. وصّل Supabase أو شغّل السيرفر.'); return; }
+  try {
+    let res;
+    if (writeSource === 'supabase') {
+      res = await apiFetch('?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: sbHeaders(), body: JSON.stringify({ price }) });
+    } else {
+      const body = Object.assign({}, p, { price });
+      res = await fetch((config.apiBase || '').replace(/\/$/, '') + '/api/Products/' + encodeURIComponent(id), {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+    }
+    if (!res.ok) { alert('السيرفر رفض حفظ السعر — كود ' + res.status); return; }
+    await loadProducts();
+  } catch (err) { alert('فشل الاتصال: ' + err.message); }
+}
+
+/* ---------- PWA: سجّل الـ Service Worker لو الصفحة متقدمة عبر https ---------- */
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('admin-sw.js').catch(() => { /* مش إجباري */ });
+}
+
+/* ---------- التشغيل ---------- */
+checkLock();
+</script>
+</body>
+</html>
